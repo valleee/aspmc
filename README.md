@@ -5,6 +5,9 @@ For usage on Linux you may also install this software as a pip package via
 ```
 pip install aspmc
 ```
+For academic usage cite 
+
+ * Eiter, T., Hecher, M., & Kiesel, R. (2021, September). Treewidth-Aware Cycle Breaking for Algebraic Answer Set Counting. In Proceedings of the International Conference on Principles of Knowledge Representation and Reasoning (Vol. 18, No. 1, pp. 269-279).
 
 ## Development setup
 For developement clone via 
