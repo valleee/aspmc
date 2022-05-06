@@ -1,14 +1,19 @@
 # aspmc
 (algebraic) answer set counter based on a treewidth-aware cycle-breaking for normal answer set programs
 
-Clone via 
+For usage on Linux you may also install this software as a pip package via
 ```
-git clone --single-branch --branch=main https://github.com/raki123/aspmc.git
+pip install aspmc
+```
+
+## Development setup
+For developement clone via 
+```
+git clone --single-branch --branch=main git@github.com:raki123/aspmc.git
 ```
 to avoid the download of the experimental results in branch `results`.
 
-## Requirements
-We include a setup bash script `setup.sh` that should automatically perform all steps required to run our code. (Except for providing the c2d binary)
+We include a setup bash script `setup.sh` that should automatically perform all steps below that are required to run our code. (Except for providing the c2d and miniC2D binary.)
 
 ### Python
 * Python >= 3.6
@@ -18,62 +23,103 @@ All required modules are listed in `requirements.txt` and can be obtained by run
 pip install -r requirements.txt
 ```
 
-### Treedecompositions via htd
-We use [htd](https://github.com/TU-Wien-DBAI/htd) to obtain treedecompositions that are needed for our treedecomposition guided clark completion and for obtaining treewidth upperbounds on the programs.
+### Tree Decompositions via flow-cutter
+We use [flow-cutter](https://github.com/kit-algo/flow-cutter-pace17) to obtain treedecompositions that are needed for our treedecomposition guided clark completion, obtaining treewidth upperbounds on the programs, variable order generation and more.
 
-It is included as a git submodule, together with [dpdb](https://github.com/hmarkus/dp_on_dbs) and [htd_validate](https://github.com/raki123/htd_validate). They are needed to parse the treedecompositions produced by htd.
+It is included as a git submodule.
 
 The submodules can be obtained by running
 ```
 git submodule update --init
 ```
 
-htd further needs to be compiled. Detailed instructions can be found [here](https://github.com/mabseher/htd/blob/master/INSTALL.md) but in all likelihood it is enough to run
+flow-cutter further needs to be compiled via
 ```
-cd lib/htd/
-cmake .
-make -j8
+cd aspmc/external/flow-cutter/
+bash build.sh
 ```
 
-### Optionally: c2d
-We use c2d to compute the number of answer sets/to obtain d-DNNF representations for probabilistic reasoning. 
-The binary needs to be provided under `lib/c2d/bin/` as `c2d_linux` and can be downloaded from [here](http://reasoning.cs.ucla.edu/c2d/).
+
+### Knowledge Compilation via d4 or sharpSAT-TD 
+We use [d4](https://github.com/raki123/d4) or [sharpSAT-TD](https://github.com/raki123/sharpsat-td) for knowledge compilation. Note that both of these are forks of the original model counters [here](https://github.com/crillab/d4) and [here](https://github.com/Laakeri/sharpsat-td/), respectively. For d4 we added support for smooth compilation and for sharpSAT-TD we used the nicely thought out addition by Tuukka Korhonen and Matti Järvisalo to enable weighted model counting over semirings in that we added a custom semiring to compile an sd-DNNF.
+
+Both are also included as a git submodules.
+
+The submodules can be obtained by running
+```
+git submodule update --init
+```
+
+They can then be compiled via 
+```
+cd aspmc/external/sharpsat-td/
+mkdir bin
+bash setupdev.sh
+cd ../../../
+cd aspmc/external/d4/
+make -j4
+cd ../../../
+```
+
+## Optionally: c2d and miniC2D
+We also are able to use c2d to obtain d-DNNF representations. 
+The c2d binary can be provided under `aspmc/external/c2d/bin/` as `c2d_linux` and can be downloaded from [here](http://reasoning.cs.ucla.edu/c2d/).
+The miniC2D binary (and the hgr2htree binary) can be provided under `aspmc/external/miniC2D/bin/linux/` as `miniC2D` (and `hgr2htree`) and can be downloaded from [here](http://reasoning.cs.ucla.edu/minic2d/).
+
+Note that they are only available for research use.
 
 ## Usage
 
 The basic usage is
 
 ```
-python bin/main.py [-m .] [-c] [-s .] [-n] [-t] [<INPUT-FILES>]
-    --mode      -m MODE         set input mode to MODE:
-                                    * asp : take a normal answer set program as input
-                                    * problog : take a *ground* problog program as input
-    --count     -c              not only output the equivalent propositional formula as out.cnf but also performs (algebraic) counting of the answer sets
-                                requires the c2d binary
-    --semiring  -s SEMIRING     use the semiring specified in the python file SEMIRING.py
-                                only useful with -m problog
-    --no_pp     -n              does not perform cycle breaking and only outputs the ground underlying answer set program
-    --treewidth -t              print the treewidth of the resulting CNF
-    --help      -h              print this help and exit
+python main.py [-m .] [-c] [-s .] [-n] [-t] [-ds .] [-dt .] [-k .] [-g .] [-h] [<INPUT-FILES>]
+    --mode          -m  MODE        set input mode to MODE:
+                                    * asp           : take a normal answer set program as input
+                                    * problog       : take a problog program as input
+                                    * smproblog     : take a problog program with negations as input
+                                    * meuproblog    : take a problog program with extra decision and utility atoms as input
+                                    * mapproblog    : take a problog program with extra evidence and map query atoms as input
+    --count         -c              not only output the equivalent cnf as out.cnf but also performs (algebraic) counting of the answer sets
+    --semiring      -s  SEMIRING    use the semiring specified in the python file aspmc/semirings/SEMIRING.py
+                                    only useful with -m problog
+    --no_pp         -n              does not perform cycle breaking and outputs a normalized version of the input program as `out.lp`
+                                    the result is equivalent, ground and does not contain annotated disjunctions.
+    --treewidth     -t              print the treewidth of the resulting CNF
+    --decos         -ds SOLVER      set the solver that computes tree decompositions to SOLVER:
+                                    * flow-cutter   : uses flow_cutter_pace17 (default)
+    --decot         -dt SECONDS     set the timeout for computing tree decompositions to SECONDS (default: 1)
+    --knowlege      -k  COMPILER    set the knowledge compiler to COMPILER:
+                                    * sharpsat-td   : uses a compilation version of sharpsat-td (default)
+                                    * d4            : uses the (slightly modified) d4 compiler. 
+                                    * c2d           : uses the c2d compiler. 
+                                    * miniC2D       : uses the miniC2D compiler. 
+    --guide_clark   -g  GUIDE       set the tree decomposition type to use to guide the clark completion to GUIDE:
+                                    * none          : preform the normal clark completion without guidance
+                                    * ors           : guide for or nodes only 
+                                    * both          : guide for both `and` and `or` nodes (default)
+    --help          -h              print this help and exit
 ```
 
 ### Examples
+These examples are for when the code is downloaded via GitHub.
+When using the pip package replace `python main.py` by `aspmc` to obtain the same result.
 #### ASP example:
 ```
-python bin/main.py -m asp -c
+python main.py -m asp -c -f 
 a :- not b.
 b :- not a.
 ```
 Reads the program from stdin and counts its models.
 
 ```
-python bin/main.py -m asp -c test/test_cycle.lp
+python main.py -m asp -c -f test/test_cycle.lp
 ```
 Reads the same program from file and counts its models.
 
 #### problog example
 ```
-python bin/main.py -m problog -c
+python main.py -m problog -c -f
 0.5::a.
 b :- a.
 query(b).
@@ -81,7 +127,7 @@ query(b).
 Evaluates the given simple program over the probability semiring.
 
 ```
-python bin/main.py -m problog -c -s maxplus
+python main.py -m problog -c -s maxplus -f
 0.5::a.
 b :- a.
 query(b).

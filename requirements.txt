@@ -1,6 +1,6 @@
 networkx
-tatsu
+numpy
+lark
 clingo
 matplotlib
-psycopg2
-future-fstrings
+dataclasses

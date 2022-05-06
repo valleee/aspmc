@@ -1,0 +1,29 @@
+include aspmc/programs/treegraph.lp
+include aspmc/programs/guess_backdoor.lp
+include aspmc/programs/guess_three.lp
+include aspmc/programs/guess_tree.lp
+
+include aspmc/external/minisat-definitions/bin/minisat
+include aspmc/external/minisat-definitions/bin/defined
+include aspmc/external/minisat-definitions/minisat/LICENSE
+
+include aspmc/external/miniC2D/bin/linux/.include
+include aspmc/external/c2d/bin/.include
+
+recursive-include aspmc/external/d4/ *
+prune aspmc/external/d4/objs/ 
+
+include aspmc/external/flow-cutter/flow_cutter_pace17
+include aspmc/external/flow-cutter/LICENSE
+
+include aspmc/external/sharpsat-td/bin/sharpSAT
+include aspmc/external/sharpsat-td/bin/flow_cutter_pace17
+include aspmc/external/sharpsat-td/LICENSE
+include aspmc/external/sharpsat-td/flowcutter/LICENSE
+include aspmc/external/sharpsat-td/src/clhash/LICENSE
+
+include aspmc/external/preprocessor/bin/sharpSAT
+include aspmc/external/preprocessor/bin/flow_cutter_pace17
+include aspmc/external/preprocessor/LICENSE
+include aspmc/external/preprocessor/flowcutter/LICENSE
+include aspmc/external/preprocessor/src/clhash/LICENSE

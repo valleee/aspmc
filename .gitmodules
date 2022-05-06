@@ -1,9 +1,25 @@
-[submodule "lib/htd_validate"]
-	path = lib/htd_validate
-	url = https://github.com/raki123/htd_validate
-[submodule "lib/nesthdb"]
-	path = lib/nesthdb
-	url = https://github.com/hmarkus/dp_on_dbs/
-[submodule "lib/htd"]
-	path = lib/htd
-	url = https://github.com/TU-Wien-DBAI/htd
+[submodule "lib/flow-cutter"]
+	path = aspmc/external/flow-cutter
+	url = git@github.com:kit-algo/flow-cutter-pace17.git
+	update = rebase
+	branch = master
+[submodule "lib/d4"]
+	path = aspmc/external/d4
+	url = git@github.com:raki123/d4.git
+	update = rebase
+	branch = main
+[submodule "lib/sharpsat-td"]
+	path = aspmc/external/sharpsat-td
+	url = git@github.com:raki123/sharpsat-td.git
+	update = rebase
+	branch = main
+[submodule "lib/minisat-definitions"]
+	path = aspmc/external/minisat-definitions
+	url = git@github.com:raki123/minisat-definitions.git
+	update = rebase
+	branch = main
+[submodule "lib/preprocessor"]
+	path = aspmc/external/preprocessor
+	url = git@github.com:martin5598/sharpsat-td-preprocessor.git
+	update = rebase
+	branch = main
