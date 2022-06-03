@@ -1,10 +1,15 @@
 # aspmc
-(algebraic) answer set counter based on a treewidth-aware cycle-breaking for normal answer set programs
+(Algebraic) answer set counter based on a treewidth-aware cycle-breaking for normal answer set programs.
 
 For usage on Linux you may also install this software as a pip package via
 ```
 pip install aspmc
 ```
+Documentation for usage as a python module is available [here](https://raki123.github.io/aspmc/). 
+Examples for command line usage are available below.
+
+If you have any issues please contact us, or even better create an issue on GitHub.
+
 For academic usage cite 
 
  * Eiter, T., Hecher, M., & Kiesel, R. (2021, September). Treewidth-Aware Cycle Breaking for Algebraic Answer Set Counting. In Proceedings of the International Conference on Principles of Knowledge Representation and Reasoning (Vol. 18, No. 1, pp. 269-279).
