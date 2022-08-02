@@ -59,12 +59,11 @@ class TwoAlgebraicProgram(Program):
         varMap = { name : var for var, name in self._nameMap.items() }
         first = set([ int(str(varMap[name])) for (name, _) in self.first_weights ])
         second = set([ int(str(varMap[name])) for (name, _) in self.second_weights ])
-        self._cnf.quantified.append(first)
-        self._cnf.quantified.append(second)
+        self._cnf.quantified = [first, second]
         for v in range(self._max*2):
             self._cnf.weights[to_dimacs(v)] = weight_list[v]
         self._cnf.transform = self.transform
-        self._cnf.semirings += [ self.first_semiring, self.second_semiring ]
+        self._cnf.semirings = [ self.first_semiring, self.second_semiring ]
 
     def get_weights(self):
         query_cnt = max(len(self.get_queries()), 1)

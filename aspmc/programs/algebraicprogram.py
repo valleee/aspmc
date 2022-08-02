@@ -222,8 +222,8 @@ class AlgebraicProgram(Program):
         weight_list = self.get_weights()
         for v in range(self._max*2):
             self._cnf.weights[to_dimacs(v)] = weight_list[v]
-        self._cnf.semirings.append(self.semiring)
-        self._cnf.quantified.append(range(1, self._max + 1))
+        self._cnf.semirings = [ self.semiring ]
+        self._cnf.quantified = [ list(range(1, self._max + 1)) ]
 
     def get_weights(self):
         query_cnt = max(len(self.queries), 1)
