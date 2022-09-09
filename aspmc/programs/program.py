@@ -361,6 +361,47 @@ class Program(object):
             plt.show()
         return res
 
+    def _compute_backdoor_fvs(self, idx):
+        comp = self._condensation.nodes[idx]["members"]
+        start = time.time()
+        import subprocess
+        #q = subprocess.Popen(["/home/rafael/projects/FVS_MPI/fvs.o"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        q = subprocess.Popen(["/home/rafael/projects/fvs-pace-challenge/build/fvs_pace_challenge"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        edges = {}
+        for v in comp:
+            ancs = set([vp[0] for vp in self.dep.in_edges(nbunch=v) if vp[0] in comp])
+            for vp in ancs:
+                if vp > v:
+                    if v not in edges:
+                        edges[v] = set()
+                    edges[v].add(vp)
+                else:
+                    if vp not in edges:
+                        edges[vp] = set()
+                    edges[vp].add(v)
+        graph = ""
+        for v in edges.keys():
+            for vp in edges[v]:
+                graph += f"{v} {vp}\n"
+        output, err = q.communicate(input=graph.encode())
+        res = [ int(v) for v in output.decode().split() ]
+        logger.debug("backdoor comp: " + str(len(comp)))
+        logger.debug("backdoor res: " + str(len(res)))
+        logger.debug(f"backdoor time: {time.time() - start}")
+        if False:
+            import matplotlib.pyplot as plt
+            from networkx.drawing.nx_pydot import graphviz_layout
+            labels = { node : "out" if node in res else "in" for node in comp }
+            local_dep = self.dep.subgraph(comp)
+            pos = graphviz_layout(local_dep, prog="neato")
+            values = [ 1.0 if node in res else 0.0 for node in local_dep.nodes()]
+            nx.draw(local_dep, pos, cmap=plt.get_cmap('viridis'), node_color=values)
+            nx.draw_networkx_labels(local_dep, pos, labels)
+            plt.tight_layout()
+            plt.axis("off")
+            plt.show()
+        return res
+
     def _compute_backdoor_maxsat(self, idx):
         comp = self._condensation.nodes[idx]["members"]
         prog = self._write_scc(comp)
@@ -494,7 +535,7 @@ class Program(object):
         for t in ts:
             comp = self._condensation.nodes[t]["members"]
             if len(comp) > 1:
-                backdoor = self._compute_backdoor(t)
+                backdoor = self._compute_backdoor_fvs(t)
                 # if the backdoor needs more than half the atoms it is better if we use all the atoms as the backdoor
                 # this is because treeprocessing has another factor*2 and backdoor*2 > comp
                 backdoor = comp if len(backdoor) > len(comp)/2 else backdoor
@@ -740,6 +781,7 @@ class Program(object):
         Returns:
             None        
         """
+        self._cnf = CNF()
         perAtom = {}
         for a in self._deriv:
             perAtom[a] = []
@@ -793,6 +835,7 @@ class Program(object):
         Returns:
             None        
         """
+        self._cnf = CNF()
         self._decomposeGraph(solver = config.config["decos"], timeout = config.config["decot"])
 
         # at which td node to handle each rule
@@ -901,6 +944,7 @@ class Program(object):
         Returns:
             None        
         """
+        self._cnf = CNF()
         # remember whats an and, whats an or and whats a constraint
         # also include the guesses, which guess exactly one of their inputs to be true
         OR = 0

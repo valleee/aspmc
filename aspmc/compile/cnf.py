@@ -151,9 +151,22 @@ class CNF(object):
         out_file.write(f"p cnf {self.nr_vars} {len(self.clauses)}\n".encode())
         for c in self.clauses:
             out_file.write(f"{' '.join([str(l) for l in c])} 0\n".encode())
+        taken = 0
         for idx in range(1, self.nr_vars + 1):
-            out_file.write(f"c p weight {idx} {idx} 0\n".encode())
-            out_file.write(f"c p weight {-idx} {-idx} 0\n".encode())
+            take = False
+            for w in self.weights[idx]:
+                if w != self.semirings[0].one():
+                    take = True
+                    break
+            for w in self.weights[-idx]:
+                if w != self.semirings[0].one():
+                    take = True
+                    break
+            if take:
+                taken += 1
+                out_file.write(f"c p weight {idx} {idx} 0\n".encode())
+                out_file.write(f"c p weight {-idx} {-idx} 0\n".encode())
+        print(taken)
 
     def write_maxsat_cnf(self, out_file):
         import math
