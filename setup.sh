@@ -28,21 +28,21 @@ else
         echo -e "${GREEN} Compiling flow-cutter. ${NC}"
         cd aspmc/external/flow-cutter/
         g++ -Wall -std=c++11 -O3 -DNDEBUG src/*.cpp -o flow_cutter_pace17 --static
-	    cd ../../../
+        cd ../../../
     fi
     if [ ! -f aspmc/external/minisat-definitions/bin/defined ] || [ ! -f aspmc/external/minisat-definitions/bin/minisat ];
     then
         echo -e "${GREEN} Compiling minisat-definitions. ${NC}"
         cd aspmc/external/minisat-definitions/
         bash setup.sh static
-	    cd ../../../
+        cd ../../../
     fi
     if [ ! -f aspmc/external/d4/d4_static ];
     then
         echo -e "${GREEN} Compiling d4. ${NC}"
         cd aspmc/external/d4/
         make -j4 rs
-	    cd ../../../
+        cd ../../../
     fi
     if [ ! -f aspmc/external/sharpsat-td/bin/sharpSAT ];
     then
@@ -50,14 +50,14 @@ else
         cd aspmc/external/sharpsat-td/
 	mkdir bin
         bash setupdev.sh static
-	    cd ../../../
+        cd ../../../
     fi
     if [ ! -f aspmc/external/preprocessor/bin/sharpSAT ];
     then
         echo -e "${GREEN} Compiling sharpSAT-TD Preprocessor. ${NC}"
         cd aspmc/external/preprocessor/
         bash setupdev.sh static
-	    cd ../../../
+        cd ../../../
     fi
     echo -e "${GREEN} Done! ${NC}"
 fi

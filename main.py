@@ -108,7 +108,8 @@ python main.py [-m .] [-c] [-s .] [-n] [-t] [-ds .] [-dt .] [-k .] [-g .] [-h] [
                                     * ors               : guide for or nodes only 
                                     * both              : guide for both `and` and `or` nodes (default)
     --verbosity     -v  VERBOSITY   set the logging level to VERBOSITY:
-                                    * info              : print everything
+                                    * debug             : print everything
+                                    * info              : print as usual
                                     * result            : only print results, warnings and errors
                                     * warning           : only print warnings and errors
                                     * errors            : only print errors
