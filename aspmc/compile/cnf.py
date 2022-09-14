@@ -166,7 +166,6 @@ class CNF(object):
                 taken += 1
                 out_file.write(f"c p weight {idx} {idx} 0\n".encode())
                 out_file.write(f"c p weight {-idx} {-idx} 0\n".encode())
-        print(taken)
 
     def write_maxsat_cnf(self, out_file):
         import math
