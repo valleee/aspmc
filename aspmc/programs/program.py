@@ -551,6 +551,8 @@ class Program(object):
                 exit(-1)
 
     def binary_cycle_breaking(self, local = False):
+        if self._td is None and local:
+            self._decomposeGraph(solver = config.config["decos"], timeout = config.config["decot"])
         self._computeComponents()
         # here we remember the new rules
         new_rules = []

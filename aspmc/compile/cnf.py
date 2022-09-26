@@ -796,7 +796,7 @@ class CNF(object):
             start = time.time()
             with os.fdopen(cnf_fd, mode='wb') as cnf_out:
                 self.write_maxsat_cnf(cnf_out)
-            p = subprocess.Popen(["/home/rafael/projects/EvalMaxSAT-Weighted/bin/RunEvalMaxSAT", cnf_tmp], stdout=subprocess.PIPE, close_fds = True)#, stderr=subprocess.PIPE)
+            p = subprocess.Popen([os.path.join(src_path, "UWrMaxSAT/uwrmaxsat/build/release/bin/uwrmaxsat"), "-m", "-bm", cnf_tmp], stdout=subprocess.PIPE, close_fds = True)#, stderr=subprocess.PIPE)
             solution = None
             while p.poll() is None or solution is None:
                 line = p.stdout.readline().decode()
@@ -814,10 +814,8 @@ class CNF(object):
                         weight[:] = zero
                         solution = list(range(1,self.nr_vars + 1))
                 elif line[0] == 'v':
-                    #print(line[2:-1])
                     bitset = line[2:-1]
                     solution = [ i if bitset[i-1] == '1' else -i for i in range(1,self.nr_vars + 1)]
-                    #print(solution)
                     weight = np.empty(first_shape, dtype=dtype)
                     weight[:] = one
                     for lit in solution:
