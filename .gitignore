@@ -1,5 +1,8 @@
 aspmc/external/c2d/*
 aspmc/external/miniC2D/*
+aspmc/external/UWrMaxSAT/COMini*
+aspmc/external/UWrMaxSAT/comini*
+aspmc/external/UWrMaxSAT/maxpre*
 out.cnf
 out_preprocessed.cnf
 out.lp

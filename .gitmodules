@@ -23,3 +23,8 @@
 	url = git@github.com:martin5598/sharpsat-td-preprocessor.git
 	update = rebase
 	branch = main
+[submodule "aspmc/external/UWrMaxSAT/uwrmaxsat"]
+	path = aspmc/external/UWrMaxSAT/uwrmaxsat
+	url = git@github.com:marekpiotrow/UWrMaxSat.git
+	update = rebase
+	branch = main
