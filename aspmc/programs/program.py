@@ -593,8 +593,8 @@ class Program(object):
             # first td pass: determine rules 
             for t in self._td.bag_iter():
                 # take the rules we need and remove them
-                rules[t] = [r for r in program if set(r.head + r.body).issubset(t.vertices)]
-                program = [r for r in program if not set(r.head + r.body).issubset(t.vertices)]
+                rules[t] = [r for r in program if set(r.head + [ abs(x) for x in r.body ]).issubset(t.vertices)]
+                program = [r for r in program if not set(r.head + [ abs(x) for x in r.body ]).issubset(t.vertices)]
         else: 
             rules[None] = list(self._program)
 
@@ -661,16 +661,17 @@ class Program(object):
                             new_rules.append(Rule([],[-t_atom, tp_atom]))
                                 
                 
-            # add the order constraints to the rules in the current node
-            for r in rules[t]:
-                if len(r.head) > 0:
-                    to_add = []
-                    head = r.head[0]
-                    for a in r.body:
-                        if a > 0:
-                            to_add.append(generateLessThan(a, head, local = local, node = t))
-                    r.body += to_add
-                new_rules.append(r)
+                # add the order constraints to the rules in the current node
+                for r in rules[t]:
+                    if len(r.head) > 0:
+                        to_add = []
+                        head = r.head[0]
+                        for a in r.body:
+                            if a > 0:
+                                to_add.append(generateLessThan(a, head, local = local, node = t))
+                        new_rules.append(Rule([], [-head] + r.body))
+                        r.body += to_add
+                    new_rules.append(r)
         else:
             # add the order constraints to the rules in the current node
             for r in rules[None]:

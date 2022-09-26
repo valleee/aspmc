@@ -254,12 +254,12 @@ def main():
     elif cycle_breaking == "lt-opt":
         program.less_than_cycle_breaking(opt=True)
     
-    logger.info("   Tp-Unfolding Done")
+    logger.info("   Cycle Breaking Done")
     logger.info("------------------------------------------------------------")
     if write_name:
         with open(f'{write_name}.lp', mode='wb') as file_out:
             program.write_prog(file_out, spanning=True)
-    logger.info("   Stats Unfolded")
+    logger.info("   Stats After Cycle Breaking")
     logger.info("------------------------------------------------------------")
     if guide == "none":
         program.clark_completion()
