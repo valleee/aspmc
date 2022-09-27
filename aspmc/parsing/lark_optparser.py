@@ -1,8 +1,12 @@
 from lark import Lark, Transformer
 import re
 
-class ProbabilisticRule(object):
-    """A class for probabilistic rules.
+from sympy import true
+
+from aspmc.parsing.lark_parser import Atom
+
+class NormalRule(object):
+    """A class for normal rules.
 
     If a rule has more than one atom in the head, the head must be an annotated disjunction.
     Then each of the atoms must have a weight.
@@ -12,23 +16,23 @@ class ProbabilisticRule(object):
     Args:        
         head (:obj:`list`): The list of head atoms. May be empty.
         body (:obj:`list`): The list of body atoms. May be empty.
-        weights (:obj:`list`): The list of weights of the head atoms. May be empty.
+        choice (bool): Whether the rule is a choice rule.
 
     Attributes:
         head (:obj:`list`): The list of head atoms. May be empty.
         body (:obj:`list`): The list of body atoms. May be empty.
-        weights (:obj:`list`): The list of weights of the head atoms. May be empty.
+        choice (bool): Whether the rule is a choice rule.
     """
-    def __init__(self, head, body, weights):
+    def __init__(self, head, body, choice):
         self.head = head
         self.body = body if body is not None else []
-        self.weights = weights
+        self.choice = choice
 
     def __str__(self):
         res = ""
         if self.head is not None:
-            if self.weights is not None:
-                res += ";".join([ f"{self.weights[i]}::{self.head[i]}" for i in range(len(self.head)) ])
+            if self.choice:
+                res += f"{{{str(self.head[0])}}}"
             else:
                 res += f"{str(self.head[0])}"
         if len(self.body) > 0:
@@ -48,17 +52,55 @@ class ProbabilisticRule(object):
         Returns:
             :obj:`string`: The representation of this rule as an ASP rule.
         """
-        res = ""
-        if self.head is not None:
-            if self.weights is not None:
-                res += f"1{{{','.join([ str(atom) for atom in self.head ])}}}1"
-            else:
-                res += str(self.head[0])
+        return str(self)
+    
+class WeakConstraint(object):
+    """A class for weak constraints.
+    
+    Weak constraints are constraints whose satisfaction is (un)desirable. 
+    This means they have a weight and an empty head.
+    Furthermore, every weak constraint may have a list of terms associated with it. 
+    The penalty `weight` will be triggered exactly once if any weak constraint with this list of terms
+    is not satisfied.
+
+    Implements a custom `__str__` method.
+
+    Args:        
+        body (:obj:`list`): The list of body atoms. May be empty.
+        weight (int): Whether the rule is a choice rule.
+        terms (:obj:`list`): The list of terms that associated with this constraint. May be empty.
+
+    Attributes:
+        body (:obj:`list`): The list of body atoms. May be empty.
+        weight (int): Whether the rule is a choice rule.
+        terms (:obj:`list`): The list of terms that associated with this constraint. May be empty.
+    """
+    def __init__(self, body, weight, terms):
+        self.body = body
+        self.weight = weight
+        self.terms = terms if terms is not None else []
+
+    def __str__(self):
+        res = ":~"
         if len(self.body) > 0:
-            res +=f":-{','.join([str(x) for x in self.body])}."
+            res +=f"{','.join([str(x) for x in self.body])}."
         else:
             res += "."
+        res += f"[{self.weight}{'' if len(self.terms) == 0 else ','}{','.join([str(x) for x in self.terms])}]"
         return res
+
+    def __repr__(self):
+        return str(self)
+    
+    def asp_string(self):
+        """Generates an ASP representation of the rule.
+
+        Implements a custom `__str__` method.
+        
+        Returns:
+            :obj:`string`: The representation of this rule as an ASP rule.
+        """
+        return str(self)
 
 
 class Atom(object):
@@ -117,8 +159,8 @@ class Atom(object):
         return vars
 
 
-class ProblogTransformer(Transformer):
-    """The corresponding ProbLog semantics class for the ProbLog grammar GRAMMAR.
+class OptProgramTransformer(Transformer):
+    """The corresponding OptProgram semantics class for the OPTGRAMMAR grammar.
     
     See the lark documentation for how this works.
     """
@@ -126,31 +168,32 @@ class ProblogTransformer(Transformer):
         return ast # sort out the comments
 
     def rule(self, ast):  # noqa
-        return ProbabilisticRule(ast[0]['head'], ast[0]['body'], ast[0]['weights'])
+        return ast[0]
 
     def fact(self, ast): #noqa
-        ast = ast[0]
-        if type(ast) == Atom: # we found an atom
-            return { 'head' : [ast], 'weights' : None, 'body' : None }
-        else: # we found an annotated disjunction
-            return ast
+        ast = ast[0][0]
+        return NormalRule([ast['atom']], [], ast['choice'])
 
     def normal_rule(self, ast):  # noqa
-        return { 'head' : ast[0]['head'], 'weights' : ast[0]['weights'], 'body': ast[1]['body'] }
-
-    def annotated_disjunction(self, ast): # noqa
-        weights = ast[::2]
-        head = ast[1::2]
-        return { 'head' : head, 'weights' : weights, 'body' : None }
-
+        return NormalRule([ast[0]['atom']], ast[1], ast[0]['choice'])
+    
+    def constraint(self, ast): #noqa
+        return NormalRule(None, ast[0], False)
+    
+    def weakconstraint(self, ast): #noqa
+        return WeakConstraint(ast[0], ast[1], ast[2])
+    
+    def head(self, ast):
+        if len(ast) == 3:
+            return { 'atom' : ast[1], 'choice' : True }
+        else:
+            return { 'atom' : ast[0], 'choice' : False }
+    
     def body(self, ast):  # noqa
         return ast
 
-    def constraint(self, ast): #noqa
-        return { 'head' : None, 'weights' : None, 'body' : ast[0] }
-
     def atom(self, ast):  # noqa
-        negated = str(ast[0]) == '\\+'
+        negated = str(ast[0]) == 'not'
         if len(ast) == 3:
             return Atom(str(ast[1]), inputs = ast[2], negated = negated)
         else:
@@ -174,22 +217,29 @@ class ProblogTransformer(Transformer):
     def weight(self, ast):  # noqa
         return str(ast[0])
 
+
 GRAMMAR = r'''
     program : rule*
 
-    rule : ( normal_rule | fact | constraint ) "."
+    rule : normal_rule | fact | constraint | weakconstraint
 
-    fact : annotated_disjunction | atom
+    fact : head "."
 
-    normal_rule : fact constraint
+    normal_rule : head ":-" body  "."
 
-    annotated_disjunction : weight "::" atom (";" weight "::" atom)*
+    constraint : ":-" body  "."
+    
+    weakconstraint : ":~" body  "." "[" weight ["," input] "]"
 
-    constraint : ":-" body
+    head : ( atom | (OPEN_ANGLE atom CLOSED_ANGLE) )
 
     body : atom ( "," atom )*
 
-    NEGATION : "\+"
+    OPEN_ANGLE : "{"
+    
+    CLOSED_ANGLE : "}"
+    
+    NEGATION : "not"
 
     atom : [NEGATION] ( /[a-z]([a-zA-Z0-9_])*/ [ "(" input ")" ]  |  "(" /[a-z]([a-zA-Z0-9_])*/ [ "(" input ")" ] ")" )
 
@@ -199,7 +249,7 @@ GRAMMAR = r'''
 
     variable : /[A-Z][a-zA-Z0-9]*/
 
-    weight :  /[+-]?([0-9]*[.])?[0-9]+/ | variable
+    weight :  /[+-]?[1-9]+[0-9]*/ | variable
 
     COMMENT : "%" /[^\n]+/
     %ignore COMMENT
@@ -211,7 +261,7 @@ GRAMMAR = r'''
 
 if __name__ == '__main__':
     import sys
-    parser = Lark(GRAMMAR, start='program', parser='lalr', transformer=ProblogTransformer())
+    parser = Lark(GRAMMAR, start='program', parser='lalr', transformer=OptProgramTransformer())
 
     with open(sys.argv[1]) as infile:
         tree = parser.parse(infile.read())
