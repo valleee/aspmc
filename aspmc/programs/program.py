@@ -323,7 +323,7 @@ class Program(object):
                 res += f"edge({vp},{v}).\n"
         return res
 
-    def _compute_backdoor_fvs(self, idx):
+    def _compute_backdoor(self, idx):
         comp = self._condensation.nodes[idx]["members"]
         start = time.time()
         import subprocess
@@ -472,7 +472,7 @@ class Program(object):
         for t in ts:
             comp = self._condensation.nodes[t]["members"]
             if len(comp) > 1:
-                backdoor = self._compute_backdoor_fvs(t)
+                backdoor = self._compute_backdoor(t)
                 # if the backdoor needs more than half the atoms it is better if we use all the atoms as the backdoor
                 # this is because treeprocessing has another factor*2 and backdoor*2 > comp
                 backdoor = comp if len(backdoor) > len(comp)/2 else backdoor

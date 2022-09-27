@@ -194,7 +194,6 @@ class ProblogProgram(Program):
                         per_head[o.head[0]] = []
                     per_head[o.head[0]].append(o)
 
-
         for idx in range(len(self.annotated_disjunctions)):
             for variables in self.annotated_disjunctions[idx]:
                 rules = self.annotated_disjunctions[idx][variables]
@@ -229,19 +228,25 @@ class ProblogProgram(Program):
                         logger.error("There must be at least one probabilistic atom in an annotated disjuntion.")
                         exit(-1)
                     rule = rules[0]
-                    conditioned_rule = conditioned[rule[0].head[0]]
-                    # if the conditioned_rule is the only rule deriving this atom we transfer the guess to it
-                    if len(conditioned_rule.head) == 1 and len(per_head[conditioned_rule.head[0]]) == 1 and len(conditioned_rule.body) == 1:
-                        actual_name = symbol_map[conditioned_rule.head[0]]
-                        conditioned_rule.body = []
-                        conditioned_rule.choice = True
-                        new_objects.append(conditioned_rule)
-                    else:
+                    if not rule[0].head[0] in conditioned:
+                        # if the atom was proven to be true during grounding there will be no conditioned rule
                         actual_name = symbol_map[rule[0].head[0]]
                         rule[0].body = [] # make the guess unconditional
                         new_objects.append(rule[0])
-                        new_objects.append(conditioned_rule)
-                    # find out the weight
+                    else:
+                        conditioned_rule = conditioned[rule[0].head[0]]
+                        # if the conditioned_rule is the only rule deriving this atom we transfer the guess to it
+                        if len(conditioned_rule.head) == 1 and len(per_head[conditioned_rule.head[0]]) == 1 and len(conditioned_rule.body) == 1:
+                            actual_name = symbol_map[conditioned_rule.head[0]]
+                            conditioned_rule.body = []
+                            conditioned_rule.choice = True
+                            new_objects.append(conditioned_rule)
+                        else:
+                            actual_name = symbol_map[rule[0].head[0]]
+                            rule[0].body = [] # make the guess unconditional
+                            new_objects.append(rule[0])
+                            new_objects.append(conditioned_rule)
+                        # find out the weight
                     head_name = symbol_map[rule[0].head[0]]
                     start = len(head_name) - 3
                     while head_name[start] != "\"":
