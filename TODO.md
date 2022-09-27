@@ -1,3 +1,4 @@
+- properly integrate a fvs solver
 - in the cnf module:
     * replace the compile functionality with an evaluate function, which chooses the correct solving strategy based on the semiring and returns the solution
     * make it so that compile actually compiles the cnf

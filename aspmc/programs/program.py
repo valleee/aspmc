@@ -23,6 +23,10 @@ from aspmc.parsing.clingoparser.clingoext import Control
 import aspmc.programs.backdoor as backdoor
 import aspmc.programs.grounder as grounder
 
+import inspect 
+
+src_path = os.path.abspath(os.path.realpath(inspect.getfile(inspect.currentframe())))
+src_path = os.path.realpath(os.path.join(src_path, '../../external'))
 
 import aspmc.config as config
 
@@ -319,54 +323,11 @@ class Program(object):
                 res += f"edge({vp},{v}).\n"
         return res
 
-    def _compute_backdoor(self, idx):
-        comp = self._condensation.nodes[idx]["members"]
-        start = time.time()
-        try:
-            try:
-                c = backdoor.ClingoControl(f"b({len(comp)}).\n" + self._write_scc(comp))
-                #print(f"b({len(comp)}).\n" + self._write_scc(comp))
-                res = c.get_backdoor(os.path.dirname(os.path.abspath(__file__)) + "/treegraph.lp", timeout = float(config.config["backdoort"]))[2][0]
-            except IndexError:
-                logger.warning(f"Backdoor guessing with optimal encoding failed, switching to easier approximation.")
-                local_dep = self.dep.subgraph(comp)
-                basis = nx.cycle_basis(local_dep.to_undirected())
-                res = []
-                while len(basis) > 0:
-                    prog = f"b({len(comp)}).\n"
-                    prog += "\n".join([f"p({v})." for v in comp if v not in res]) + "\n"
-                    for c in basis:
-                        prog += ":-" + ", ".join([f"not abs({v})" for v in c]) + ".\n"
-                    c = backdoor.ClingoControl(prog)
-                    res += c.get_backdoor(os.path.dirname(os.path.abspath(__file__)) + "/guess_backdoor.lp", timeout = float(config.config["backdoort"]))[2][0]
-                    local_dep = self.dep.subgraph([x for x in comp if x not in res])
-                    basis = nx.cycle_basis(local_dep.to_undirected())
-        except IndexError:
-            res = comp
-            logger.error("backdoor guessing failed, returning whole component.")
-        logger.debug("backdoor comp: " + str(len(comp)))
-        logger.debug("backdoor res: " + str(len(res)))
-        logger.debug(f"backdoor time: {time.time() - start}")
-        if False:
-            import matplotlib.pyplot as plt
-            from networkx.drawing.nx_pydot import graphviz_layout
-            labels = { node : "out" if node in res else "in" for node in comp }
-            local_dep = self.dep.subgraph(comp)
-            pos = graphviz_layout(local_dep, prog="neato")
-            values = [ 1.0 if node in res else 0.0 for node in local_dep.nodes()]
-            nx.draw(local_dep, pos, cmap=plt.get_cmap('viridis'), node_color=values)
-            nx.draw_networkx_labels(local_dep, pos, labels)
-            plt.tight_layout()
-            plt.axis("off")
-            plt.show()
-        return res
-
     def _compute_backdoor_fvs(self, idx):
         comp = self._condensation.nodes[idx]["members"]
         start = time.time()
         import subprocess
-        #q = subprocess.Popen(["/home/rafael/projects/FVS_MPI/fvs.o"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        q = subprocess.Popen(["/home/rafael/projects/fvs-pace-challenge/build/fvs_pace_challenge"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        q = subprocess.Popen([os.path.join(src_path, "fvs/src/build/FeedbackVertexSet")], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         edges = {}
         for v in comp:
             ancs = set([vp[0] for vp in self.dep.in_edges(nbunch=v) if vp[0] in comp])
@@ -383,8 +344,13 @@ class Program(object):
         for v in edges.keys():
             for vp in edges[v]:
                 graph += f"{v} {vp}\n"
-        output, err = q.communicate(input=graph.encode())
-        res = [ int(v) for v in output.decode().split() ]
+        try:
+            output, err = q.communicate(input=graph.encode(), timeout = float(config.config["backdoort"]))
+        except subprocess.TimeoutExpired:
+            logger.warning(f"Optimal backdoor computation failed, switching to approximation.")
+            q = subprocess.Popen([os.path.join(src_path, "fvs/src/build/FeedbackVertexSet"), "Appx"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+            output, err = q.communicate(input=graph.encode())
+        res = [ int(v) for v in output.decode().split()[1:] ]
         logger.debug("backdoor comp: " + str(len(comp)))
         logger.debug("backdoor res: " + str(len(res)))
         logger.debug(f"backdoor time: {time.time() - start}")
@@ -401,35 +367,6 @@ class Program(object):
             plt.axis("off")
             plt.show()
         return res
-
-    def _compute_backdoor_maxsat(self, idx):
-        comp = self._condensation.nodes[idx]["members"]
-        prog = self._write_scc(comp)
-        program = Program(program_str = prog, program_files=[os.path.dirname(os.path.abspath(__file__)) + "/treegraph.lp"])
-        #program._guess = set()
-        #prog = program._prog_string(program._program)
-        #prog += "-1.0::abs(X):-p(X).\n"
-        #prog = prog.replace("not", "\\+")
-        import aspmc.programs.algebraicprogram as ap
-        import aspmc.semirings.maxplus as maxplus
-        aprogram = ap.AlgebraicProgram("", [], maxplus)
-        aprogram._program = program._program
-        aprogram._deriv = program._deriv
-        aprogram._guess = program._guess
-        aprogram._nameMap = program._nameMap
-        aprogram._max = program._max
-        aprogram.weights = { (program._external_name(v), True) : maxplus.parse("-1") for v in program._guess }
-
-        #program.less_than_cycle_breaking()
-        aprogram.clark_completion()
-        with open("maxsat.wcnf", mode='wb') as file_out:
-            aprogram._cnf.write_maxsat_cnf(file_out)
-        print("wrote maxsat")
-
-        #logger.debug("backdoor comp: " + str(len(comp)))
-        #logger.debug("backdoor res: " + str(len(res)))
-        #logger.debug(f"backdoor time: {time.time() - start}")
-        #return res
 
     def _backdoor_process(self, comp, backdoor):
         comp = set(comp)

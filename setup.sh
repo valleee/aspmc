@@ -115,6 +115,17 @@ else
         #MAXPRE=  make r  
         #* 5.3 or with the one below if you do not want to use the SCIP library only:  
         USESCIP=  make r  
+        cd ../../../../
+    fi
+    if [ ! -f aspmc/external/fvs/src/build/FeedbackVertexSet ];
+    then
+        echo -e "${GREEN} Compiling Feedback Vertex Set Solver. ${NC}"
+        cd aspmc/external/fvs/src
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Release ..
+        make
+        cd ../../../../../
     fi
     echo -e "${GREEN} Done! ${NC}"
 fi

@@ -28,3 +28,8 @@
 	url = git@github.com:marekpiotrow/UWrMaxSat.git
 	update = rebase
 	branch = main
+[submodule "aspmc/external/fvs"]
+	path = aspmc/external/fvs
+	url = git@github.com:raki123/FeedbackVertexSet-Experiments.git
+	update = rebase
+	branch = main
