@@ -85,6 +85,7 @@ aspmc version 1.0.0, May 2, 2022
 python main.py [-m .] [-c] [-s .] [-n] [-t] [-ds .] [-dt .] [-k .] [-g .] [-b .] [-h] [<INPUT-FILES>]
     --mode              -m  MODE        set input mode to MODE:
                                         * asp               : take a normal answer set program as input
+                                        * optasp            : take a normal answer set program with weak constraints as input
                                         * cnf               : take an (extended) cnf as input
                                         * problog           : take a problog program as input
                                         * smproblog         : take a problog program with negations as input
@@ -286,11 +287,12 @@ def main():
     if not count:
         exit(0)
 
-    if mode == "mpeproblog":
+    if mode == "mpeproblog" or mode == "optasp":
         weight, solution = cnf.solve_maxsat()
+        weight = weight[0]
         assignment = ", ".join([ program._external_name(v) for v in program._guess if v in solution ])
-        logger.info(f"The overall weight of the program is {weight}")# with {assignment}")
-    #     return
+        logger.result(f"The overall weight of the program is {weight}")# with {assignment}")
+        return
     # compile the cnf into a tractable circuit representation and perform the (algebraic) model counting
     results = cnf.compile(preprocessing)
 

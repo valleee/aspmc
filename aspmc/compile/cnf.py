@@ -173,6 +173,9 @@ class CNF(object):
         if self.semirings[0].__name__ == "aspmc.semirings.maxtimes":
             # we first need to convert into maxplus weights
             real_weights = { l : math.log(w) if w > 0 else float("-inf") for l,w in real_weights.items() }
+        elif self.semirings[0].__name__ == "aspmc.semirings.minplus":
+            # we first need to convert into maxplus weights
+            real_weights = { l : -w if w != float("inf") else float("-inf") for l,w in real_weights.items() }
         # sort out variables that are irrelevant
         real_weights = { l : w for l,w in real_weights.items() if w != real_weights[-l]}
         # handle hard constraints from literals with weight -inf and keep the rest
