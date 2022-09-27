@@ -17,6 +17,7 @@ from aspmc.programs.smprogram import SMProblogProgram
 from aspmc.programs.meuprogram import MEUProblogProgram
 from aspmc.programs.mapprogram import MAPProblogProgram
 from aspmc.programs.mpeprogram import MPEProblogProgram
+from aspmc.programs.optprogram import OptProgram
 
 
 import aspmc.config as config
@@ -145,7 +146,8 @@ def main():
         if sys.argv[1].startswith("-"):
             if sys.argv[1] == "-m" or sys.argv[1] == "--mode":
                 mode = sys.argv[2]
-                if mode != "problog" and mode != "asp" and mode != "smproblog" and mode != "meuproblog" and mode != "mapproblog" and mode != "mpeproblog":
+                if mode != "problog" and mode != "asp" and mode != "smproblog" and mode != "meuproblog" \
+                    and mode != "mapproblog" and mode != "mpeproblog" and mode != "optasp":
                     logger.error("  Unknown mode: " + mode)
                     exit(-1)
                 del sys.argv[1:3]
@@ -231,6 +233,8 @@ def main():
         program = MAPProblogProgram(program_str, program_files)
     elif mode == "mpeproblog":
         program = MPEProblogProgram(program_str, program_files)
+    elif mode == "optasp":
+        program = OptProgram(program_str, program_files)
     else:
         program = Program(program_str = program_str, program_files = program_files)
 
@@ -254,12 +258,12 @@ def main():
     elif cycle_breaking == "lt-opt":
         program.less_than_cycle_breaking(opt=True)
     
-    logger.info("   Tp-Unfolding Done")
+    logger.info("   Cycle Breaking Done")
     logger.info("------------------------------------------------------------")
     if write_name:
         with open(f'{write_name}.lp', mode='wb') as file_out:
             program.write_prog(file_out, spanning=True)
-    logger.info("   Stats Unfolded")
+    logger.info("   Stats After Cycle Breaking")
     logger.info("------------------------------------------------------------")
     if guide == "none":
         program.clark_completion()

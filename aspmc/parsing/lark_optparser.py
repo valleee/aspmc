@@ -171,7 +171,7 @@ class OptProgramTransformer(Transformer):
         return ast[0]
 
     def fact(self, ast): #noqa
-        ast = ast[0][0]
+        ast = ast[0]
         return NormalRule([ast['atom']], [], ast['choice'])
 
     def normal_rule(self, ast):  # noqa

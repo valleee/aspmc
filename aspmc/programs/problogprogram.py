@@ -26,8 +26,7 @@ class ProblogProgram(Program):
 
     Should be specified in ProbLog syntax, but allows negations and negative cycles.
 
-    Annotated disjunctions are theoretically supported over any semiring but the results are likely to 
-    be wrong over semirings that differ from the probabilistic semiring.
+    For programs over semirings that are not the probabilistic one, see aspmc.programs.algebraicprogram.
 
     Grounding of these programs (and subclasses thereof) should follow the following strategy:
 
@@ -52,7 +51,6 @@ class ProblogProgram(Program):
         May be the empty string.
         program_files (:obj:`list`): A list of string that are paths to files which contain programs in 
         ProbLog syntax that should be included. May be an empty list.
-        semiring (:obj:`module`): The semiring module to be used. See aspmc.semiring for how they should look.
 
     Attributes:
         semiring (:obj:`module`): The semiring module to be used. 
