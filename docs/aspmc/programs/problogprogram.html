@@ -94,8 +94,7 @@
 
 <span class="sd">    Should be specified in ProbLog syntax, but allows negations and negative cycles.</span>
 
-<span class="sd">    Annotated disjunctions are theoretically supported over any semiring but the results are likely to </span>
-<span class="sd">    be wrong over semirings that differ from the probabilistic semiring.</span>
+<span class="sd">    For programs over semirings that are not the probabilistic one, see aspmc.programs.algebraicprogram.</span>
 
 <span class="sd">    Grounding of these programs (and subclasses thereof) should follow the following strategy:</span>
 
@@ -120,7 +119,6 @@
 <span class="sd">        May be the empty string.</span>
 <span class="sd">        program_files (:obj:`list`): A list of string that are paths to files which contain programs in </span>
 <span class="sd">        ProbLog syntax that should be included. May be an empty list.</span>
-<span class="sd">        semiring (:obj:`module`): The semiring module to be used. See aspmc.semiring for how they should look.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        semiring (:obj:`module`): The semiring module to be used. </span>
@@ -264,7 +262,6 @@
                         <span class="n">per_head</span><span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="n">per_head</span><span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
 
-
         <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annotated_disjunctions</span><span class="p">)):</span>
             <span class="k">for</span> <span class="n">variables</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotated_disjunctions</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
                 <span class="n">rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotated_disjunctions</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">variables</span><span class="p">]</span>
@@ -299,19 +296,25 @@
                         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;There must be at least one probabilistic atom in an annotated disjuntion.&quot;</span><span class="p">)</span>
                         <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
                     <span class="n">rule</span> <span class="o">=</span> <span class="n">rules</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">conditioned_rule</span> <span class="o">=</span> <span class="n">conditioned</span><span class="p">[</span><span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-                    <span class="c1"># if the conditioned_rule is the only rule deriving this atom we transfer the guess to it</span>
-                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">conditioned_rule</span><span class="o">.</span><span class="n">head</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">per_head</span><span class="p">[</span><span class="n">conditioned_rule</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">conditioned_rule</span><span class="o">.</span><span class="n">body</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                        <span class="n">actual_name</span> <span class="o">=</span> <span class="n">symbol_map</span><span class="p">[</span><span class="n">conditioned_rule</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-                        <span class="n">conditioned_rule</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="p">[]</span>
-                        <span class="n">conditioned_rule</span><span class="o">.</span><span class="n">choice</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="n">new_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conditioned_rule</span><span class="p">)</span>
-                    <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">conditioned</span><span class="p">:</span>
+                        <span class="c1"># if the atom was proven to be true during grounding there will be no conditioned rule</span>
                         <span class="n">actual_name</span> <span class="o">=</span> <span class="n">symbol_map</span><span class="p">[</span><span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
                         <span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># make the guess unconditional</span>
                         <span class="n">new_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                        <span class="n">new_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conditioned_rule</span><span class="p">)</span>
-                    <span class="c1"># find out the weight</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">conditioned_rule</span> <span class="o">=</span> <span class="n">conditioned</span><span class="p">[</span><span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                        <span class="c1"># if the conditioned_rule is the only rule deriving this atom we transfer the guess to it</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">conditioned_rule</span><span class="o">.</span><span class="n">head</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">per_head</span><span class="p">[</span><span class="n">conditioned_rule</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">conditioned_rule</span><span class="o">.</span><span class="n">body</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                            <span class="n">actual_name</span> <span class="o">=</span> <span class="n">symbol_map</span><span class="p">[</span><span class="n">conditioned_rule</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                            <span class="n">conditioned_rule</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="p">[]</span>
+                            <span class="n">conditioned_rule</span><span class="o">.</span><span class="n">choice</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="n">new_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conditioned_rule</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">actual_name</span> <span class="o">=</span> <span class="n">symbol_map</span><span class="p">[</span><span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                            <span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># make the guess unconditional</span>
+                            <span class="n">new_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                            <span class="n">new_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conditioned_rule</span><span class="p">)</span>
+                        <span class="c1"># find out the weight</span>
                     <span class="n">head_name</span> <span class="o">=</span> <span class="n">symbol_map</span><span class="p">[</span><span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
                     <span class="n">start</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">head_name</span><span class="p">)</span> <span class="o">-</span> <span class="mi">3</span>
                     <span class="k">while</span> <span class="n">head_name</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">:</span>
@@ -340,8 +343,8 @@
         <span class="n">weight_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_weights</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_max</span><span class="o">*</span><span class="mi">2</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cnf</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">to_dimacs</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span> <span class="o">=</span> <span class="n">weight_list</span><span class="p">[</span><span class="n">v</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cnf</span><span class="o">.</span><span class="n">semirings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">semiring</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cnf</span><span class="o">.</span><span class="n">quantified</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cnf</span><span class="o">.</span><span class="n">semirings</span> <span class="o">=</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">semiring</span> <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cnf</span><span class="o">.</span><span class="n">quantified</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">get_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">query_cnt</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queries</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
@@ -377,8 +380,7 @@
 
 <span class="sd">    Should be specified in ProbLog syntax, but allows negations and negative cycles.</span>
 
-<span class="sd">    Annotated disjunctions are theoretically supported over any semiring but the results are likely to </span>
-<span class="sd">    be wrong over semirings that differ from the probabilistic semiring.</span>
+<span class="sd">    For programs over semirings that are not the probabilistic one, see aspmc.programs.algebraicprogram.</span>
 
 <span class="sd">    Grounding of these programs (and subclasses thereof) should follow the following strategy:</span>
 
@@ -403,7 +405,6 @@
 <span class="sd">        May be the empty string.</span>
 <span class="sd">        program_files (:obj:`list`): A list of string that are paths to files which contain programs in </span>
 <span class="sd">        ProbLog syntax that should be included. May be an empty list.</span>
-<span class="sd">        semiring (:obj:`module`): The semiring module to be used. See aspmc.semiring for how they should look.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        semiring (:obj:`module`): The semiring module to be used. </span>
@@ -547,7 +548,6 @@
                         <span class="n">per_head</span><span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
                     <span class="n">per_head</span><span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
 
-
         <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annotated_disjunctions</span><span class="p">)):</span>
             <span class="k">for</span> <span class="n">variables</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotated_disjunctions</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
                 <span class="n">rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotated_disjunctions</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">variables</span><span class="p">]</span>
@@ -582,19 +582,25 @@
                         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;There must be at least one probabilistic atom in an annotated disjuntion.&quot;</span><span class="p">)</span>
                         <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
                     <span class="n">rule</span> <span class="o">=</span> <span class="n">rules</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">conditioned_rule</span> <span class="o">=</span> <span class="n">conditioned</span><span class="p">[</span><span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-                    <span class="c1"># if the conditioned_rule is the only rule deriving this atom we transfer the guess to it</span>
-                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">conditioned_rule</span><span class="o">.</span><span class="n">head</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">per_head</span><span class="p">[</span><span class="n">conditioned_rule</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">conditioned_rule</span><span class="o">.</span><span class="n">body</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                        <span class="n">actual_name</span> <span class="o">=</span> <span class="n">symbol_map</span><span class="p">[</span><span class="n">conditioned_rule</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-                        <span class="n">conditioned_rule</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="p">[]</span>
-                        <span class="n">conditioned_rule</span><span class="o">.</span><span class="n">choice</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="n">new_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conditioned_rule</span><span class="p">)</span>
-                    <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">conditioned</span><span class="p">:</span>
+                        <span class="c1"># if the atom was proven to be true during grounding there will be no conditioned rule</span>
                         <span class="n">actual_name</span> <span class="o">=</span> <span class="n">symbol_map</span><span class="p">[</span><span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
                         <span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># make the guess unconditional</span>
                         <span class="n">new_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                        <span class="n">new_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conditioned_rule</span><span class="p">)</span>
-                    <span class="c1"># find out the weight</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">conditioned_rule</span> <span class="o">=</span> <span class="n">conditioned</span><span class="p">[</span><span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                        <span class="c1"># if the conditioned_rule is the only rule deriving this atom we transfer the guess to it</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">conditioned_rule</span><span class="o">.</span><span class="n">head</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">per_head</span><span class="p">[</span><span class="n">conditioned_rule</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">conditioned_rule</span><span class="o">.</span><span class="n">body</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                            <span class="n">actual_name</span> <span class="o">=</span> <span class="n">symbol_map</span><span class="p">[</span><span class="n">conditioned_rule</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                            <span class="n">conditioned_rule</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="p">[]</span>
+                            <span class="n">conditioned_rule</span><span class="o">.</span><span class="n">choice</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="n">new_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conditioned_rule</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">actual_name</span> <span class="o">=</span> <span class="n">symbol_map</span><span class="p">[</span><span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                            <span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># make the guess unconditional</span>
+                            <span class="n">new_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                            <span class="n">new_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conditioned_rule</span><span class="p">)</span>
+                        <span class="c1"># find out the weight</span>
                     <span class="n">head_name</span> <span class="o">=</span> <span class="n">symbol_map</span><span class="p">[</span><span class="n">rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
                     <span class="n">start</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">head_name</span><span class="p">)</span> <span class="o">-</span> <span class="mi">3</span>
                     <span class="k">while</span> <span class="n">head_name</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">:</span>
@@ -623,8 +629,8 @@
         <span class="n">weight_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_weights</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_max</span><span class="o">*</span><span class="mi">2</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cnf</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">to_dimacs</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span> <span class="o">=</span> <span class="n">weight_list</span><span class="p">[</span><span class="n">v</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cnf</span><span class="o">.</span><span class="n">semirings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">semiring</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cnf</span><span class="o">.</span><span class="n">quantified</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cnf</span><span class="o">.</span><span class="n">semirings</span> <span class="o">=</span> <span class="p">[</span> <span class="bp">self</span><span class="o">.</span><span class="n">semiring</span> <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cnf</span><span class="o">.</span><span class="n">quantified</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">get_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">query_cnt</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queries</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
@@ -647,8 +653,7 @@
 
 <p>Should be specified in ProbLog syntax, but allows negations and negative cycles.</p>
 
-<p>Annotated disjunctions are theoretically supported over any semiring but the results are likely to 
-be wrong over semirings that differ from the probabilistic semiring.</p>
+<p>For programs over semirings that are not the probabilistic one, see <a href="algebraicprogram.html">aspmc.programs.algebraicprogram</a>.</p>
 
 <p>Grounding of these programs (and subclasses thereof) should follow the following strategy:</p>
 
@@ -678,7 +683,6 @@ to handle their extras. See <a href="meuprogram.html">aspmc.programs.meuprogram<
 <li>May be the empty string.</li>
 <li><strong>program_files (<code>list</code>):</strong>  A list of string that are paths to files which contain programs in </li>
 <li>ProbLog syntax that should be included. May be an empty list.</li>
-<li><strong>semiring (<code>module</code>):</strong>  The semiring module to be used. See <a href="../../aspmc.html#semiring">aspmc.semiring</a> for how they should look.</li>
 </ul>
 
 <h6 id="attributes">Attributes</h6>

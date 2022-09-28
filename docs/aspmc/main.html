@@ -76,6 +76,9 @@
 <span class="kn">from</span> <span class="nn">aspmc.programs.meuprogram</span> <span class="kn">import</span> <span class="n">MEUProblogProgram</span>
 <span class="kn">from</span> <span class="nn">aspmc.programs.mapprogram</span> <span class="kn">import</span> <span class="n">MAPProblogProgram</span>
 <span class="kn">from</span> <span class="nn">aspmc.programs.mpeprogram</span> <span class="kn">import</span> <span class="n">MPEProblogProgram</span>
+<span class="kn">from</span> <span class="nn">aspmc.programs.optprogram</span> <span class="kn">import</span> <span class="n">OptProgram</span>
+
+<span class="kn">from</span> <span class="nn">aspmc.compile.cnf</span> <span class="kn">import</span> <span class="n">CNF</span>
 
 
 <span class="kn">import</span> <span class="nn">aspmc.config</span> <span class="k">as</span> <span class="nn">config</span>
@@ -138,40 +141,53 @@
 
 <span class="n">help_string</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">aspmc: An Algebraic Answer Set Counter</span>
-<span class="s2">aspmc version 1.0.0, May 2, 2022</span>
+<span class="s2">aspmc version 1.0.2, Sep 28, 2022</span>
 
-<span class="s2">python main.py [-m .] [-c] [-s .] [-n] [-t] [-ds .] [-dt .] [-k .] [-g .] [-h] [&lt;INPUT-FILES&gt;]</span>
-<span class="s2">    --mode          -m  MODE        set input mode to MODE:</span>
-<span class="s2">                                    * asp               : take a normal answer set program as input</span>
-<span class="s2">                                    * problog           : take a problog program as input</span>
-<span class="s2">                                    * smproblog         : take a problog program with negations as input</span>
-<span class="s2">                                    * meuproblog        : take a problog program with extra decision and utility atoms as input</span>
-<span class="s2">                                    * mapproblog        : take a problog program with extra evidence and map query atoms as input</span>
-<span class="s2">    --count         -c              not only output the equivalent cnf as out.cnf but also performs (algebraic) counting of the answer sets</span>
-<span class="s2">    --semiring      -s  SEMIRING    use the semiring specified in the python file aspmc/semirings/SEMIRING.py</span>
-<span class="s2">                                    only useful with -m problog</span>
-<span class="s2">    --no_pp         -n              does not perform cycle breaking and outputs a normalized version of the input program as `out.lp`</span>
-<span class="s2">                                    the result is equivalent, ground and does not contain annotated disjunctions.</span>
-<span class="s2">    --treewidth     -t              print the treewidth of the resulting CNF</span>
-<span class="s2">    --decos         -ds SOLVER      set the solver that computes tree decompositions to SOLVER:</span>
-<span class="s2">                                    * flow-cutter       : uses flow_cutter_pace17 (default)</span>
-<span class="s2">    --decot         -dt SECONDS     set the timeout for computing tree decompositions to SECONDS (default: 1)</span>
-<span class="s2">    --knowlege      -k  COMPILER    set the knowledge compiler to COMPILER:</span>
-<span class="s2">                                    * sharpsat-td       : uses a compilation version of sharpsat-td (default)</span>
-<span class="s2">                                    * sharpsat-td-live  : uses a compilation version of sharpsat-td where compilation and counting are simultaneous</span>
-<span class="s2">                                    * d4                : uses the (slightly modified) d4 compiler. </span>
-<span class="s2">                                    * c2d               : uses the c2d compiler. </span>
-<span class="s2">                                    * miniC2D           : uses the miniC2D compiler. </span>
-<span class="s2">    --guide_clark   -g  GUIDE       set the tree decomposition type to use to guide the clark completion to GUIDE:</span>
-<span class="s2">                                    * none              : preform the normal clark completion without guidance</span>
-<span class="s2">                                    * ors               : guide for or nodes only </span>
-<span class="s2">                                    * both              : guide for both `and` and `or` nodes (default)</span>
-<span class="s2">    --verbosity     -v  VERBOSITY   set the logging level to VERBOSITY:</span>
-<span class="s2">                                    * info              : print everything</span>
-<span class="s2">                                    * result            : only print results, warnings and errors</span>
-<span class="s2">                                    * warning           : only print warnings and errors</span>
-<span class="s2">                                    * errors            : only print errors</span>
-<span class="s2">    --help          -h              print this help and exit</span>
+<span class="s2">python main.py [-m .] [-c] [-s .] [-n] [-t] [-ds .] [-dt .] [-k .] [-g .] [-b .] [-h] [&lt;INPUT-FILES&gt;]</span>
+<span class="s2">    --mode              -m  MODE        set input mode to MODE:</span>
+<span class="s2">                                        * asp               : take a normal answer set program as input</span>
+<span class="s2">                                        * optasp            : take a normal answer set program with weak constraints as input</span>
+<span class="s2">                                        * cnf               : take an (extended) cnf as input</span>
+<span class="s2">                                        * problog           : take a problog program as input</span>
+<span class="s2">                                        * smproblog         : take a problog program with negations as input</span>
+<span class="s2">                                        * meuproblog        : take a problog program with extra decision and utility atoms as input</span>
+<span class="s2">                                        * mapproblog        : take a problog program with extra evidence and map query atoms as input</span>
+<span class="s2">                                        * mpeproblog        : take a problog program with extra evidence atoms as input</span>
+<span class="s2">    --count             -c              not only output the equivalent cnf as out.cnf but also performs (algebraic) counting of the answer sets</span>
+<span class="s2">    --semiring          -s  SEMIRING    use the semiring specified in the python file aspmc/semirings/SEMIRING.py</span>
+<span class="s2">                                        only useful with -m problog</span>
+<span class="s2">    --no_pp             -n              does not perform cycle breaking and outputs a normalized version of the input program as `out.lp`</span>
+<span class="s2">                                        the result is equivalent, ground and does not contain annotated disjunctions.</span>
+<span class="s2">    --treewidth         -t              print the treewidth of the resulting CNF</span>
+<span class="s2">    --decos             -ds SOLVER      set the solver that computes tree decompositions to SOLVER:</span>
+<span class="s2">                                        * flow-cutter       : uses flow_cutter_pace17 (default)</span>
+<span class="s2">    --decot             -dt SECONDS     set the timeout for computing tree decompositions to SECONDS (default: 1)</span>
+<span class="s2">    --knowlege          -k  COMPILER    set the knowledge compiler to COMPILER:</span>
+<span class="s2">                                        * sharpsat-td       : uses a compilation version of sharpsat-td (default)</span>
+<span class="s2">                                        * sharpsat-td-live  : uses a compilation version of sharpsat-td where compilation and counting are simultaneous</span>
+<span class="s2">                                        * d4                : uses the (slightly modified) d4 compiler. </span>
+<span class="s2">                                        * c2d               : uses the c2d compiler. </span>
+<span class="s2">                                        * miniC2D           : uses the miniC2D compiler. </span>
+<span class="s2">    --guide_clark       -g  GUIDE       set the tree decomposition type to use to guide the clark completion to GUIDE:</span>
+<span class="s2">                                        * none              : preform the normal clark completion without guidance</span>
+<span class="s2">                                        * ors               : guide for or nodes only </span>
+<span class="s2">                                        * both              : guide for both `and` and `or` nodes (default)</span>
+<span class="s2">    --cycle-breaking    -b  STRATEGY    set the cycle-breaking strategy to STRATEGY:</span>
+<span class="s2">                                        * none              : do not perform cycle-breaking, not suitable for model counting</span>
+<span class="s2">                                        * tp                : perform tp-unfolding, suitable for model counting (default)</span>
+<span class="s2">                                        * binary            : use the strategy of Janhunen without local and global ranking constraints</span>
+<span class="s2">                                                                not suitable for model counting</span>
+<span class="s2">                                        * binary-opt        : use the strategy of Hecher, not suitable for model counting</span>
+<span class="s2">                                        * lt                : use the strategy of Lin and Zhao, not suitable for model counting</span>
+<span class="s2">                                        * lt-opt            : use a modified version of Lin and Zhao&#39;s strategy with a smaller encoding,</span>
+<span class="s2">                                                                not suitable for model counting</span>
+<span class="s2">    --verbosity         -v  VERBOSITY   set the logging level to VERBOSITY:</span>
+<span class="s2">                                        * debug             : print everything</span>
+<span class="s2">                                        * info              : print as usual</span>
+<span class="s2">                                        * result            : only print results, warnings and errors</span>
+<span class="s2">                                        * warning           : only print warnings and errors</span>
+<span class="s2">                                        * errors            : only print errors</span>
+<span class="s2">    --help              -h              print this help and exit</span>
 <span class="s2">&quot;&quot;&quot;</span>
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
@@ -192,7 +208,8 @@
         <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;-m&quot;</span> <span class="ow">or</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;--mode&quot;</span><span class="p">:</span>
                 <span class="n">mode</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;problog&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;asp&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;smproblog&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;meuproblog&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;mapproblog&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;mpeproblog&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;problog&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;asp&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;smproblog&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;meuproblog&quot;</span> \
+                    <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;mapproblog&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;mpeproblog&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;optasp&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;cnf&quot;</span><span class="p">:</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;  Unknown mode: &quot;</span> <span class="o">+</span> <span class="n">mode</span><span class="p">)</span>
                     <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
                 <span class="k">del</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
@@ -278,69 +295,77 @@
         <span class="n">program</span> <span class="o">=</span> <span class="n">MAPProblogProgram</span><span class="p">(</span><span class="n">program_str</span><span class="p">,</span> <span class="n">program_files</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;mpeproblog&quot;</span><span class="p">:</span>
         <span class="n">program</span> <span class="o">=</span> <span class="n">MPEProblogProgram</span><span class="p">(</span><span class="n">program_str</span><span class="p">,</span> <span class="n">program_files</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;optasp&quot;</span><span class="p">:</span>
+        <span class="n">program</span> <span class="o">=</span> <span class="n">OptProgram</span><span class="p">(</span><span class="n">program_str</span><span class="p">,</span> <span class="n">program_files</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;cnf&quot;</span><span class="p">:</span>
+        <span class="n">cnf</span> <span class="o">=</span> <span class="n">CNF</span><span class="p">(</span><span class="n">program_files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">program</span> <span class="o">=</span> <span class="n">Program</span><span class="p">(</span><span class="n">program_str</span> <span class="o">=</span> <span class="n">program_str</span><span class="p">,</span> <span class="n">program_files</span> <span class="o">=</span> <span class="n">program_files</span><span class="p">)</span>
 
-    <span class="c1"># perform the cycle breaking</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;   Stats Original&quot;</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
-    <span class="n">program</span><span class="o">.</span><span class="n">_decomposeGraph</span><span class="p">()</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">no_pp</span> <span class="ow">and</span> <span class="n">write_name</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">write_name</span><span class="si">}</span><span class="s1">.lp&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_out</span><span class="p">:</span>
-            <span class="n">program</span><span class="o">.</span><span class="n">write_prog</span><span class="p">(</span><span class="n">file_out</span><span class="p">)</span>
-            <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;tp&quot;</span><span class="p">:</span>
-        <span class="n">program</span><span class="o">.</span><span class="n">tpUnfold</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
-        <span class="n">program</span><span class="o">.</span><span class="n">binary_cycle_breaking</span><span class="p">(</span><span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;binary-opt&quot;</span><span class="p">:</span>
-        <span class="n">program</span><span class="o">.</span><span class="n">binary_cycle_breaking</span><span class="p">(</span><span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;lt&quot;</span><span class="p">:</span>
-        <span class="n">program</span><span class="o">.</span><span class="n">less_than_cycle_breaking</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;lt-opt&quot;</span><span class="p">:</span>
-        <span class="n">program</span><span class="o">.</span><span class="n">less_than_cycle_breaking</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;   Tp-Unfolding Done&quot;</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">write_name</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">write_name</span><span class="si">}</span><span class="s1">.lp&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_out</span><span class="p">:</span>
-            <span class="n">program</span><span class="o">.</span><span class="n">write_prog</span><span class="p">(</span><span class="n">file_out</span><span class="p">,</span> <span class="n">spanning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;   Stats Unfolded&quot;</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">guide</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
-        <span class="n">program</span><span class="o">.</span><span class="n">clark_completion</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">guide</span> <span class="o">==</span> <span class="s2">&quot;ors&quot;</span><span class="p">:</span>
-        <span class="n">program</span><span class="o">.</span><span class="n">td_guided_clark_completion</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">program</span><span class="o">.</span><span class="n">td_guided_both_clark_completion</span><span class="p">()</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">write_name</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">write_name</span><span class="si">}</span><span class="s1">.cnf&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_out</span><span class="p">:</span>
-            <span class="n">program</span><span class="o">.</span><span class="n">write_dimacs</span><span class="p">(</span><span class="n">file_out</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;cnf&quot;</span><span class="p">:</span>
+        <span class="c1"># perform the cycle breaking</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;   Stats Original&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
+        <span class="n">program</span><span class="o">.</span><span class="n">_decomposeGraph</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">no_pp</span> <span class="ow">and</span> <span class="n">write_name</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">write_name</span><span class="si">}</span><span class="s1">.lp&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_out</span><span class="p">:</span>
+                <span class="n">program</span><span class="o">.</span><span class="n">write_prog</span><span class="p">(</span><span class="n">file_out</span><span class="p">)</span>
+                <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;tp&quot;</span><span class="p">:</span>
+            <span class="n">program</span><span class="o">.</span><span class="n">tpUnfold</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
+            <span class="n">program</span><span class="o">.</span><span class="n">binary_cycle_breaking</span><span class="p">(</span><span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;binary-opt&quot;</span><span class="p">:</span>
+            <span class="n">program</span><span class="o">.</span><span class="n">binary_cycle_breaking</span><span class="p">(</span><span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;lt&quot;</span><span class="p">:</span>
+            <span class="n">program</span><span class="o">.</span><span class="n">less_than_cycle_breaking</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;lt-opt&quot;</span><span class="p">:</span>
+            <span class="n">program</span><span class="o">.</span><span class="n">less_than_cycle_breaking</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;   Cycle Breaking Done&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">write_name</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">write_name</span><span class="si">}</span><span class="s1">.lp&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_out</span><span class="p">:</span>
+                <span class="n">program</span><span class="o">.</span><span class="n">write_prog</span><span class="p">(</span><span class="n">file_out</span><span class="p">,</span> <span class="n">spanning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;   Stats After Cycle Breaking&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">guide</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+            <span class="n">program</span><span class="o">.</span><span class="n">clark_completion</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">guide</span> <span class="o">==</span> <span class="s2">&quot;ors&quot;</span><span class="p">:</span>
+            <span class="n">program</span><span class="o">.</span><span class="n">td_guided_clark_completion</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">program</span><span class="o">.</span><span class="n">td_guided_both_clark_completion</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">write_name</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">write_name</span><span class="si">}</span><span class="s1">.cnf&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_out</span><span class="p">:</span>
+                <span class="n">program</span><span class="o">.</span><span class="n">write_dimacs</span><span class="p">(</span><span class="n">file_out</span><span class="p">)</span>
 
-    <span class="n">cnf</span> <span class="o">=</span> <span class="n">program</span><span class="o">.</span><span class="n">get_cnf</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">treewidth</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;   Stats CNF&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
-        <span class="n">program</span><span class="o">.</span><span class="n">encoding_stats</span><span class="p">()</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
+        <span class="n">cnf</span> <span class="o">=</span> <span class="n">program</span><span class="o">.</span><span class="n">get_cnf</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">treewidth</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;   Stats CNF&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
+            <span class="n">program</span><span class="o">.</span><span class="n">encoding_stats</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">count</span><span class="p">:</span>
         <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;mpeproblog&quot;</span><span class="p">:</span>
-        <span class="n">weight</span><span class="p">,</span> <span class="n">solution</span> <span class="o">=</span> <span class="n">cnf</span><span class="o">.</span><span class="n">solve_maxsat</span><span class="p">()</span>
-        <span class="n">assignment</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span> <span class="n">program</span><span class="o">.</span><span class="n">_external_name</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">program</span><span class="o">.</span><span class="n">_guess</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">solution</span> <span class="p">])</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The overall weight of the program is </span><span class="si">{</span><span class="n">weight</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="c1">#&quot; with {assignment}&quot;)</span>
-        <span class="k">return</span>
-    <span class="c1"># compile the cnf into a tractable circuit representation and perform the (algebraic) model counting</span>
-    <span class="n">results</span> <span class="o">=</span> <span class="n">cnf</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">preprocessing</span><span class="p">)</span>
+    <span class="c1"># if mode == &quot;mpeproblog&quot; or mode == &quot;optasp&quot;:</span>
+    <span class="c1">#     weight, solution = cnf.solve_maxsat()</span>
+    <span class="c1">#     weight = weight[0]</span>
+    <span class="c1">#     assignment = &quot;, &quot;.join([ program._external_name(v) for v in program._guess if v in solution ])</span>
+    <span class="c1">#     logger.result(f&quot;The overall weight of the program is {weight}&quot;)# with {assignment}&quot;)</span>
+    <span class="c1">#     return</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">cnf</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="s2">&quot;flexible&quot;</span><span class="p">,</span> <span class="n">preprocessing</span> <span class="o">=</span> <span class="n">preprocessing</span><span class="p">)</span>
 
     <span class="c1"># print the results</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;   Results&quot;</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
-    <span class="n">queries</span> <span class="o">=</span> <span class="n">program</span><span class="o">.</span><span class="n">get_queries</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;cnf&quot;</span><span class="p">:</span>
+        <span class="n">queries</span> <span class="o">=</span> <span class="n">program</span><span class="o">.</span><span class="n">get_queries</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">queries</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">query</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">queries</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">result</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,(</span><span class="mi">20</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">query</span><span class="p">)))</span><span class="si">}{</span><span class="n">results</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -473,7 +498,8 @@ raise an <code>AttributeError</code> if the level name is already an attribute o
         <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;-m&quot;</span> <span class="ow">or</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;--mode&quot;</span><span class="p">:</span>
                 <span class="n">mode</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;problog&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;asp&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;smproblog&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;meuproblog&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;mapproblog&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;mpeproblog&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;problog&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;asp&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;smproblog&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;meuproblog&quot;</span> \
+                    <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;mapproblog&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;mpeproblog&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;optasp&quot;</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;cnf&quot;</span><span class="p">:</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;  Unknown mode: &quot;</span> <span class="o">+</span> <span class="n">mode</span><span class="p">)</span>
                     <span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
                 <span class="k">del</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
@@ -559,69 +585,77 @@ raise an <code>AttributeError</code> if the level name is already an attribute o
         <span class="n">program</span> <span class="o">=</span> <span class="n">MAPProblogProgram</span><span class="p">(</span><span class="n">program_str</span><span class="p">,</span> <span class="n">program_files</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;mpeproblog&quot;</span><span class="p">:</span>
         <span class="n">program</span> <span class="o">=</span> <span class="n">MPEProblogProgram</span><span class="p">(</span><span class="n">program_str</span><span class="p">,</span> <span class="n">program_files</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;optasp&quot;</span><span class="p">:</span>
+        <span class="n">program</span> <span class="o">=</span> <span class="n">OptProgram</span><span class="p">(</span><span class="n">program_str</span><span class="p">,</span> <span class="n">program_files</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;cnf&quot;</span><span class="p">:</span>
+        <span class="n">cnf</span> <span class="o">=</span> <span class="n">CNF</span><span class="p">(</span><span class="n">program_files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">program</span> <span class="o">=</span> <span class="n">Program</span><span class="p">(</span><span class="n">program_str</span> <span class="o">=</span> <span class="n">program_str</span><span class="p">,</span> <span class="n">program_files</span> <span class="o">=</span> <span class="n">program_files</span><span class="p">)</span>
 
-    <span class="c1"># perform the cycle breaking</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;   Stats Original&quot;</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
-    <span class="n">program</span><span class="o">.</span><span class="n">_decomposeGraph</span><span class="p">()</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">no_pp</span> <span class="ow">and</span> <span class="n">write_name</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">write_name</span><span class="si">}</span><span class="s1">.lp&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_out</span><span class="p">:</span>
-            <span class="n">program</span><span class="o">.</span><span class="n">write_prog</span><span class="p">(</span><span class="n">file_out</span><span class="p">)</span>
-            <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;tp&quot;</span><span class="p">:</span>
-        <span class="n">program</span><span class="o">.</span><span class="n">tpUnfold</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
-        <span class="n">program</span><span class="o">.</span><span class="n">binary_cycle_breaking</span><span class="p">(</span><span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;binary-opt&quot;</span><span class="p">:</span>
-        <span class="n">program</span><span class="o">.</span><span class="n">binary_cycle_breaking</span><span class="p">(</span><span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;lt&quot;</span><span class="p">:</span>
-        <span class="n">program</span><span class="o">.</span><span class="n">less_than_cycle_breaking</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;lt-opt&quot;</span><span class="p">:</span>
-        <span class="n">program</span><span class="o">.</span><span class="n">less_than_cycle_breaking</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;   Tp-Unfolding Done&quot;</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">write_name</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">write_name</span><span class="si">}</span><span class="s1">.lp&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_out</span><span class="p">:</span>
-            <span class="n">program</span><span class="o">.</span><span class="n">write_prog</span><span class="p">(</span><span class="n">file_out</span><span class="p">,</span> <span class="n">spanning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;   Stats Unfolded&quot;</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">guide</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
-        <span class="n">program</span><span class="o">.</span><span class="n">clark_completion</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">guide</span> <span class="o">==</span> <span class="s2">&quot;ors&quot;</span><span class="p">:</span>
-        <span class="n">program</span><span class="o">.</span><span class="n">td_guided_clark_completion</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">program</span><span class="o">.</span><span class="n">td_guided_both_clark_completion</span><span class="p">()</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">write_name</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">write_name</span><span class="si">}</span><span class="s1">.cnf&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_out</span><span class="p">:</span>
-            <span class="n">program</span><span class="o">.</span><span class="n">write_dimacs</span><span class="p">(</span><span class="n">file_out</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;cnf&quot;</span><span class="p">:</span>
+        <span class="c1"># perform the cycle breaking</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;   Stats Original&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
+        <span class="n">program</span><span class="o">.</span><span class="n">_decomposeGraph</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">no_pp</span> <span class="ow">and</span> <span class="n">write_name</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">write_name</span><span class="si">}</span><span class="s1">.lp&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_out</span><span class="p">:</span>
+                <span class="n">program</span><span class="o">.</span><span class="n">write_prog</span><span class="p">(</span><span class="n">file_out</span><span class="p">)</span>
+                <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;tp&quot;</span><span class="p">:</span>
+            <span class="n">program</span><span class="o">.</span><span class="n">tpUnfold</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;binary&quot;</span><span class="p">:</span>
+            <span class="n">program</span><span class="o">.</span><span class="n">binary_cycle_breaking</span><span class="p">(</span><span class="n">local</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;binary-opt&quot;</span><span class="p">:</span>
+            <span class="n">program</span><span class="o">.</span><span class="n">binary_cycle_breaking</span><span class="p">(</span><span class="n">local</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;lt&quot;</span><span class="p">:</span>
+            <span class="n">program</span><span class="o">.</span><span class="n">less_than_cycle_breaking</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">cycle_breaking</span> <span class="o">==</span> <span class="s2">&quot;lt-opt&quot;</span><span class="p">:</span>
+            <span class="n">program</span><span class="o">.</span><span class="n">less_than_cycle_breaking</span><span class="p">(</span><span class="n">opt</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;   Cycle Breaking Done&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">write_name</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">write_name</span><span class="si">}</span><span class="s1">.lp&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_out</span><span class="p">:</span>
+                <span class="n">program</span><span class="o">.</span><span class="n">write_prog</span><span class="p">(</span><span class="n">file_out</span><span class="p">,</span> <span class="n">spanning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;   Stats After Cycle Breaking&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">guide</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+            <span class="n">program</span><span class="o">.</span><span class="n">clark_completion</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">guide</span> <span class="o">==</span> <span class="s2">&quot;ors&quot;</span><span class="p">:</span>
+            <span class="n">program</span><span class="o">.</span><span class="n">td_guided_clark_completion</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">program</span><span class="o">.</span><span class="n">td_guided_both_clark_completion</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">write_name</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">write_name</span><span class="si">}</span><span class="s1">.cnf&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_out</span><span class="p">:</span>
+                <span class="n">program</span><span class="o">.</span><span class="n">write_dimacs</span><span class="p">(</span><span class="n">file_out</span><span class="p">)</span>
 
-    <span class="n">cnf</span> <span class="o">=</span> <span class="n">program</span><span class="o">.</span><span class="n">get_cnf</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">treewidth</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;   Stats CNF&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
-        <span class="n">program</span><span class="o">.</span><span class="n">encoding_stats</span><span class="p">()</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
+        <span class="n">cnf</span> <span class="o">=</span> <span class="n">program</span><span class="o">.</span><span class="n">get_cnf</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">treewidth</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;   Stats CNF&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
+            <span class="n">program</span><span class="o">.</span><span class="n">encoding_stats</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">count</span><span class="p">:</span>
         <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;mpeproblog&quot;</span><span class="p">:</span>
-        <span class="n">weight</span><span class="p">,</span> <span class="n">solution</span> <span class="o">=</span> <span class="n">cnf</span><span class="o">.</span><span class="n">solve_maxsat</span><span class="p">()</span>
-        <span class="n">assignment</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span> <span class="n">program</span><span class="o">.</span><span class="n">_external_name</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">program</span><span class="o">.</span><span class="n">_guess</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">solution</span> <span class="p">])</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The overall weight of the program is </span><span class="si">{</span><span class="n">weight</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="c1">#&quot; with {assignment}&quot;)</span>
-        <span class="k">return</span>
-    <span class="c1"># compile the cnf into a tractable circuit representation and perform the (algebraic) model counting</span>
-    <span class="n">results</span> <span class="o">=</span> <span class="n">cnf</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">preprocessing</span><span class="p">)</span>
+    <span class="c1"># if mode == &quot;mpeproblog&quot; or mode == &quot;optasp&quot;:</span>
+    <span class="c1">#     weight, solution = cnf.solve_maxsat()</span>
+    <span class="c1">#     weight = weight[0]</span>
+    <span class="c1">#     assignment = &quot;, &quot;.join([ program._external_name(v) for v in program._guess if v in solution ])</span>
+    <span class="c1">#     logger.result(f&quot;The overall weight of the program is {weight}&quot;)# with {assignment}&quot;)</span>
+    <span class="c1">#     return</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">cnf</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="s2">&quot;flexible&quot;</span><span class="p">,</span> <span class="n">preprocessing</span> <span class="o">=</span> <span class="n">preprocessing</span><span class="p">)</span>
 
     <span class="c1"># print the results</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;   Results&quot;</span><span class="p">)</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;------------------------------------------------------------&quot;</span><span class="p">)</span>
-    <span class="n">queries</span> <span class="o">=</span> <span class="n">program</span><span class="o">.</span><span class="n">get_queries</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;cnf&quot;</span><span class="p">:</span>
+        <span class="n">queries</span> <span class="o">=</span> <span class="n">program</span><span class="o">.</span><span class="n">get_queries</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">queries</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">query</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">queries</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">result</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,(</span><span class="mi">20</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">query</span><span class="p">)))</span><span class="si">}{</span><span class="n">results</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="pdoc 8.0.1" />
-    <title>aspmc.parsing.lark_parser API documentation</title>
+    <title>aspmc.parsing.lark_optparser API documentation</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2264%22%20height%3D%2264%22%20viewBox%3D%2244.5%202.5%2015%2015%22%3E%3Cpath%20d%3D%22M49.351%2021.041c-.233-.721-.546-2.408-.772-4.076-.042-.09-.067-.187-.046-.288-.166-1.347-.277-2.625-.241-3.351-1.378-1.008-2.271-2.586-2.271-4.362%200-.976.272-1.935.788-2.774.057-.094.122-.18.184-.268-.033-.167-.052-.339-.052-.516%200-1.477%201.202-2.679%202.679-2.679.791%200%201.496.352%201.987.9a6.3%206.3%200%200%201%201.001.029c.492-.564%201.207-.929%202.012-.929%201.477%200%202.679%201.202%202.679%202.679a2.65%202.65%200%200%201-.269%201.148c.383.747.595%201.572.595%202.41%200%202.311-1.507%204.29-3.635%205.107.037.699.147%202.27.423%203.294l.137.461c.156%202.136-4.612%205.166-5.199%203.215zm.127-4.919a4.78%204.78%200%200%200%20.775-.584c-.172-.115-.505-.254-.88-.378zm.331%202.302l.828-.502c-.202-.143-.576-.328-.984-.49zm.45%202.157l.701-.403c-.214-.115-.536-.249-.891-.376l.19.779zM49.13%204.141c0%20.152.123.276.276.276s.275-.124.275-.276-.123-.276-.276-.276-.275.124-.275.276zm.735-.389a1.15%201.15%200%200%201%20.314.783%201.16%201.16%200%200%201-1.162%201.162c-.457%200-.842-.27-1.032-.653-.026.117-.042.238-.042.362a1.68%201.68%200%200%200%201.679%201.679%201.68%201.68%200%200%200%201.679-1.679c0-.843-.626-1.535-1.436-1.654zm3.076%201.654a1.68%201.68%200%200%200%201.679%201.679%201.68%201.68%200%200%200%201.679-1.679c0-.037-.009-.072-.011-.109-.21.3-.541.508-.935.508a1.16%201.16%200%200%201-1.162-1.162%201.14%201.14%200%200%201%20.474-.912c-.015%200-.03-.005-.045-.005-.926.001-1.679.754-1.679%201.68zm1.861-1.265c0%20.152.123.276.276.276s.275-.124.275-.276-.123-.276-.276-.276-.275.124-.275.276zm1.823%204.823c0-.52-.103-1.035-.288-1.52-.466.394-1.06.64-1.717.64-1.144%200-2.116-.725-2.499-1.738-.383%201.012-1.355%201.738-2.499%201.738-.867%200-1.631-.421-2.121-1.062-.307.605-.478%201.267-.478%201.942%200%202.486%202.153%204.51%204.801%204.51s4.801-2.023%204.801-4.51zm-3.032%209.156l-.146-.492c-.276-1.02-.395-2.457-.444-3.268a6.11%206.11%200%200%201-1.18.115%206.01%206.01%200%200%201-2.536-.562l.006.175c.802.215%201.848.612%202.021%201.25.079.295-.021.601-.274.837l-.598.501c.667.304%201.243.698%201.311%201.179.02.144.022.507-.393.787l-.564.365c1.285.521%201.361.96%201.381%201.126.018.142.011.496-.427.746l-.854.489c.064-1.19%201.985-2.585%202.697-3.248zM49.34%209.925c0-.667%201-.667%201%200%200%20.653.818%201.205%201.787%201.205s1.787-.552%201.787-1.205c0-.667%201-.667%201%200%200%201.216-1.25%202.205-2.787%202.205s-2.787-.989-2.787-2.205zm-.887-7.633c-.093.077-.205.114-.317.114a.5.5%200%200%201-.318-.886L49.183.397a.5.5%200%200%201%20.703.068.5.5%200%200%201-.069.703zm7.661-.065c-.086%200-.173-.022-.253-.068l-1.523-.893c-.575-.337-.069-1.2.506-.863l1.523.892a.5.5%200%200%201%20.179.685c-.094.158-.261.247-.432.247z%22%20fill%3D%22%233bb300%22/%3E%3C/svg%3E"/>
 
 
@@ -31,13 +31,25 @@
                     <h2>API Documentation</h2>
                         <ul class="memberlist">
             <li>
-                    <a class="class" href="#ProbabilisticRule">ProbabilisticRule</a>
+                    <a class="class" href="#NormalRule">NormalRule</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="function" href="#ProbabilisticRule.__init__">ProbabilisticRule</a>
+                                <a class="function" href="#NormalRule.__init__">NormalRule</a>
                         </li>
                         <li>
-                                <a class="function" href="#ProbabilisticRule.asp_string">asp_string</a>
+                                <a class="function" href="#NormalRule.asp_string">asp_string</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#WeakConstraint">WeakConstraint</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#WeakConstraint.__init__">WeakConstraint</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#WeakConstraint.asp_string">asp_string</a>
                         </li>
                 </ul>
 
@@ -55,43 +67,46 @@
 
             </li>
             <li>
-                    <a class="class" href="#ProblogTransformer">ProblogTransformer</a>
+                    <a class="class" href="#OptProgramTransformer">OptProgramTransformer</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="function" href="#ProblogTransformer.program">program</a>
+                                <a class="function" href="#OptProgramTransformer.program">program</a>
                         </li>
                         <li>
-                                <a class="function" href="#ProblogTransformer.rule">rule</a>
+                                <a class="function" href="#OptProgramTransformer.rule">rule</a>
                         </li>
                         <li>
-                                <a class="function" href="#ProblogTransformer.fact">fact</a>
+                                <a class="function" href="#OptProgramTransformer.fact">fact</a>
                         </li>
                         <li>
-                                <a class="function" href="#ProblogTransformer.normal_rule">normal_rule</a>
+                                <a class="function" href="#OptProgramTransformer.normal_rule">normal_rule</a>
                         </li>
                         <li>
-                                <a class="function" href="#ProblogTransformer.annotated_disjunction">annotated_disjunction</a>
+                                <a class="function" href="#OptProgramTransformer.constraint">constraint</a>
                         </li>
                         <li>
-                                <a class="function" href="#ProblogTransformer.body">body</a>
+                                <a class="function" href="#OptProgramTransformer.weakconstraint">weakconstraint</a>
                         </li>
                         <li>
-                                <a class="function" href="#ProblogTransformer.constraint">constraint</a>
+                                <a class="function" href="#OptProgramTransformer.head">head</a>
                         </li>
                         <li>
-                                <a class="function" href="#ProblogTransformer.atom">atom</a>
+                                <a class="function" href="#OptProgramTransformer.body">body</a>
                         </li>
                         <li>
-                                <a class="function" href="#ProblogTransformer.input">input</a>
+                                <a class="function" href="#OptProgramTransformer.atom">atom</a>
                         </li>
                         <li>
-                                <a class="function" href="#ProblogTransformer.term">term</a>
+                                <a class="function" href="#OptProgramTransformer.input">input</a>
                         </li>
                         <li>
-                                <a class="function" href="#ProblogTransformer.variable">variable</a>
+                                <a class="function" href="#OptProgramTransformer.term">term</a>
                         </li>
                         <li>
-                                <a class="function" href="#ProblogTransformer.weight">weight</a>
+                                <a class="function" href="#OptProgramTransformer.variable">variable</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#OptProgramTransformer.weight">weight</a>
                         </li>
                 </ul>
 
@@ -110,7 +125,7 @@
     <main class="pdoc">
             <section>
                     <h1 class="modulename">
-<a href="./../../aspmc.html">aspmc</a><wbr>.<a href="./../parsing.html">parsing</a><wbr>.lark_parser    </h1>
+<a href="./../../aspmc.html">aspmc</a><wbr>.<a href="./../parsing.html">parsing</a><wbr>.lark_optparser    </h1>
 
                 
                         <details>
@@ -118,8 +133,12 @@
             <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">lark</span> <span class="kn">import</span> <span class="n">Lark</span><span class="p">,</span> <span class="n">Transformer</span>
 <span class="kn">import</span> <span class="nn">re</span>
 
-<span class="k">class</span> <span class="nc">ProbabilisticRule</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A class for probabilistic rules.</span>
+<span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">true</span>
+
+<span class="kn">from</span> <span class="nn">aspmc.parsing.lark_parser</span> <span class="kn">import</span> <span class="n">Atom</span>
+
+<span class="k">class</span> <span class="nc">NormalRule</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A class for normal rules.</span>
 
 <span class="sd">    If a rule has more than one atom in the head, the head must be an annotated disjunction.</span>
 <span class="sd">    Then each of the atoms must have a weight.</span>
@@ -129,23 +148,23 @@
 <span class="sd">    Args:        </span>
 <span class="sd">        head (:obj:`list`): The list of head atoms. May be empty.</span>
 <span class="sd">        body (:obj:`list`): The list of body atoms. May be empty.</span>
-<span class="sd">        weights (:obj:`list`): The list of weights of the head atoms. May be empty.</span>
+<span class="sd">        choice (bool): Whether the rule is a choice rule.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        head (:obj:`list`): The list of head atoms. May be empty.</span>
 <span class="sd">        body (:obj:`list`): The list of body atoms. May be empty.</span>
-<span class="sd">        weights (:obj:`list`): The list of weights of the head atoms. May be empty.</span>
+<span class="sd">        choice (bool): Whether the rule is a choice rule.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">choice</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">head</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">body</span> <span class="k">if</span> <span class="n">body</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">choice</span> <span class="o">=</span> <span class="n">choice</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">res</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">res</span> <span class="o">+=</span> <span class="s2">&quot;;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">::</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">))</span> <span class="p">])</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">choice</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">{{</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">res</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -165,17 +184,55 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            :obj:`string`: The representation of this rule as an ASP rule.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">res</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;1</span><span class="se">{{</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span> <span class="nb">str</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="p">])</span><span class="si">}</span><span class="se">}}</span><span class="s2">1&quot;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">res</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    
+<span class="k">class</span> <span class="nc">WeakConstraint</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A class for weak constraints.</span>
+<span class="sd">    </span>
+<span class="sd">    Weak constraints are constraints whose satisfaction is (un)desirable. </span>
+<span class="sd">    This means they have a weight and an empty head.</span>
+<span class="sd">    Furthermore, every weak constraint may have a list of terms associated with it. </span>
+<span class="sd">    The penalty `weight` will be triggered exactly once if any weak constraint with this list of terms</span>
+<span class="sd">    is not satisfied.</span>
+
+<span class="sd">    Implements a custom `__str__` method.</span>
+
+<span class="sd">    Args:        </span>
+<span class="sd">        body (:obj:`list`): The list of body atoms. May be empty.</span>
+<span class="sd">        weight (int): Whether the rule is a choice rule.</span>
+<span class="sd">        terms (:obj:`list`): The list of terms that associated with this constraint. May be empty.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        body (:obj:`list`): The list of body atoms. May be empty.</span>
+<span class="sd">        weight (int): Whether the rule is a choice rule.</span>
+<span class="sd">        terms (:obj:`list`): The list of terms that associated with this constraint. May be empty.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">terms</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">body</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">weight</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terms</span> <span class="o">=</span> <span class="n">terms</span> <span class="k">if</span> <span class="n">terms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="s2">&quot;:~&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">res</span> <span class="o">+=</span><span class="sa">f</span><span class="s2">&quot;:-</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="p">])</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="n">res</span> <span class="o">+=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="p">])</span><span class="si">}</span><span class="s2">.&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">res</span> <span class="o">+=</span> <span class="s2">&quot;.&quot;</span>
+        <span class="n">res</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="si">}{</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">terms</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;,&#39;</span><span class="si">}{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">terms</span><span class="p">])</span><span class="si">}</span><span class="s2">]&quot;</span>
         <span class="k">return</span> <span class="n">res</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">asp_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates an ASP representation of the rule.</span>
+
+<span class="sd">        Implements a custom `__str__` method.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            :obj:`string`: The representation of this rule as an ASP rule.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">Atom</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -234,8 +291,8 @@
         <span class="k">return</span> <span class="nb">vars</span>
 
 
-<span class="k">class</span> <span class="nc">ProblogTransformer</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;The corresponding ProbLog semantics class for the ProbLog grammar GRAMMAR.</span>
+<span class="k">class</span> <span class="nc">OptProgramTransformer</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The corresponding OptProgram semantics class for the OPTGRAMMAR grammar.</span>
 <span class="sd">    </span>
 <span class="sd">    See the lark documentation for how this works.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -243,33 +300,34 @@
         <span class="k">return</span> <span class="n">ast</span> <span class="c1"># sort out the comments</span>
 
     <span class="k">def</span> <span class="nf">rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span>  <span class="c1"># noqa</span>
-        <span class="k">return</span> <span class="n">ProbabilisticRule</span><span class="p">(</span><span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;head&#39;</span><span class="p">],</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;body&#39;</span><span class="p">],</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;weights&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">fact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span> <span class="c1">#noqa</span>
         <span class="n">ast</span> <span class="o">=</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">ast</span><span class="p">)</span> <span class="o">==</span> <span class="n">Atom</span><span class="p">:</span> <span class="c1"># we found an atom</span>
-            <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;head&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="n">ast</span><span class="p">],</span> <span class="s1">&#39;weights&#39;</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;body&#39;</span> <span class="p">:</span> <span class="kc">None</span> <span class="p">}</span>
-        <span class="k">else</span><span class="p">:</span> <span class="c1"># we found an annotated disjunction</span>
-            <span class="k">return</span> <span class="n">ast</span>
+        <span class="k">return</span> <span class="n">NormalRule</span><span class="p">([</span><span class="n">ast</span><span class="p">[</span><span class="s1">&#39;atom&#39;</span><span class="p">]],</span> <span class="p">[],</span> <span class="n">ast</span><span class="p">[</span><span class="s1">&#39;choice&#39;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">normal_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span>  <span class="c1"># noqa</span>
-        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;head&#39;</span> <span class="p">:</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;head&#39;</span><span class="p">],</span> <span class="s1">&#39;weights&#39;</span> <span class="p">:</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;weights&#39;</span><span class="p">],</span> <span class="s1">&#39;body&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;body&#39;</span><span class="p">]</span> <span class="p">}</span>
-
-    <span class="k">def</span> <span class="nf">annotated_disjunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span> <span class="c1"># noqa</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">ast</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span>
-        <span class="n">head</span> <span class="o">=</span> <span class="n">ast</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span>
-        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;head&#39;</span> <span class="p">:</span> <span class="n">head</span><span class="p">,</span> <span class="s1">&#39;weights&#39;</span> <span class="p">:</span> <span class="n">weights</span><span class="p">,</span> <span class="s1">&#39;body&#39;</span> <span class="p">:</span> <span class="kc">None</span> <span class="p">}</span>
-
+        <span class="k">return</span> <span class="n">NormalRule</span><span class="p">([</span><span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;atom&#39;</span><span class="p">]],</span> <span class="n">ast</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;choice&#39;</span><span class="p">])</span>
+    
+    <span class="k">def</span> <span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span> <span class="c1">#noqa</span>
+        <span class="k">return</span> <span class="n">NormalRule</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">False</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">weakconstraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span> <span class="c1">#noqa</span>
+        <span class="k">return</span> <span class="n">WeakConstraint</span><span class="p">(</span><span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ast</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ast</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    
+    <span class="k">def</span> <span class="nf">head</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ast</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;atom&#39;</span> <span class="p">:</span> <span class="n">ast</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;choice&#39;</span> <span class="p">:</span> <span class="kc">True</span> <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;atom&#39;</span> <span class="p">:</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;choice&#39;</span> <span class="p">:</span> <span class="kc">False</span> <span class="p">}</span>
+    
     <span class="k">def</span> <span class="nf">body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span>  <span class="c1"># noqa</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ast</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">ast</span>
 
-    <span class="k">def</span> <span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span> <span class="c1">#noqa</span>
-        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;head&#39;</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;weights&#39;</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;body&#39;</span> <span class="p">:</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">}</span>
-
     <span class="k">def</span> <span class="nf">atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span>  <span class="c1"># noqa</span>
-        <span class="n">negated</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">+&#39;</span>
+        <span class="n">negated</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="s1">&#39;not&#39;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ast</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">Atom</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ast</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">inputs</span> <span class="o">=</span> <span class="n">ast</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">negated</span> <span class="o">=</span> <span class="n">negated</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -293,22 +351,29 @@
     <span class="k">def</span> <span class="nf">weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span>  <span class="c1"># noqa</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
+
 <span class="n">GRAMMAR</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;&#39;&#39;</span>
 <span class="s1">    program : rule*</span>
 
-<span class="s1">    rule : ( normal_rule | fact | constraint ) &quot;.&quot;</span>
+<span class="s1">    rule : normal_rule | fact | constraint | weakconstraint</span>
 
-<span class="s1">    fact : annotated_disjunction | atom</span>
+<span class="s1">    fact : head &quot;.&quot;</span>
 
-<span class="s1">    normal_rule : fact constraint</span>
+<span class="s1">    normal_rule : head &quot;:-&quot; body  &quot;.&quot;</span>
 
-<span class="s1">    annotated_disjunction : weight &quot;::&quot; atom (&quot;;&quot; weight &quot;::&quot; atom)*</span>
+<span class="s1">    constraint : &quot;:-&quot; body  &quot;.&quot;</span>
+<span class="s1">    </span>
+<span class="s1">    weakconstraint : &quot;:~&quot; body  &quot;.&quot; &quot;[&quot; weight [&quot;,&quot; input] &quot;]&quot;</span>
 
-<span class="s1">    constraint : &quot;:-&quot; body</span>
+<span class="s1">    head : ( atom | (OPEN_ANGLE atom CLOSED_ANGLE) )</span>
 
 <span class="s1">    body : [ atom ( &quot;,&quot; atom )* ]</span>
 
-<span class="s1">    NEGATION : &quot;\+&quot;</span>
+<span class="s1">    OPEN_ANGLE : &quot;{&quot;</span>
+<span class="s1">    </span>
+<span class="s1">    CLOSED_ANGLE : &quot;}&quot;</span>
+<span class="s1">    </span>
+<span class="s1">    NEGATION : &quot;not&quot;</span>
 
 <span class="s1">    atom : [NEGATION] ( /[a-z]([a-zA-Z0-9_])*/ [ &quot;(&quot; input &quot;)&quot; ]  |  &quot;(&quot; /[a-z]([a-zA-Z0-9_])*/ [ &quot;(&quot; input &quot;)&quot; ] &quot;)&quot; )</span>
 
@@ -318,7 +383,7 @@
 
 <span class="s1">    variable : /[A-Z][a-zA-Z0-9]*/</span>
 
-<span class="s1">    weight :  /[+-]?([0-9]*[.])?[0-9]+/ | variable</span>
+<span class="s1">    weight :  /[+-]?[1-9]+[0-9]*/ | variable</span>
 
 <span class="s1">    COMMENT : &quot;%&quot; /[^\n]+/</span>
 <span class="s1">    </span><span class="si">%i</span><span class="s1">gnore COMMENT</span>
@@ -330,7 +395,7 @@
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">sys</span>
-    <span class="n">parser</span> <span class="o">=</span> <span class="n">Lark</span><span class="p">(</span><span class="n">GRAMMAR</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s1">&#39;program&#39;</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="s1">&#39;lalr&#39;</span><span class="p">,</span> <span class="n">transformer</span><span class="o">=</span><span class="n">ProblogTransformer</span><span class="p">())</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">Lark</span><span class="p">(</span><span class="n">GRAMMAR</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="s1">&#39;program&#39;</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="s1">&#39;lalr&#39;</span><span class="p">,</span> <span class="n">transformer</span><span class="o">=</span><span class="n">OptProgramTransformer</span><span class="p">())</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
         <span class="n">tree</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
@@ -341,19 +406,19 @@
         </details>
 
             </section>
-                <section id="ProbabilisticRule">
+                <section id="NormalRule">
                                 <div class="attr class">
-        <a class="headerlink" href="#ProbabilisticRule">#&nbsp;&nbsp</a>
+        <a class="headerlink" href="#NormalRule">#&nbsp;&nbsp</a>
 
         
         <span class="def">class</span>
-        <span class="name">ProbabilisticRule</span>:
+        <span class="name">NormalRule</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">ProbabilisticRule</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A class for probabilistic rules.</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">NormalRule</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A class for normal rules.</span>
 
 <span class="sd">    If a rule has more than one atom in the head, the head must be an annotated disjunction.</span>
 <span class="sd">    Then each of the atoms must have a weight.</span>
@@ -363,23 +428,23 @@
 <span class="sd">    Args:        </span>
 <span class="sd">        head (:obj:`list`): The list of head atoms. May be empty.</span>
 <span class="sd">        body (:obj:`list`): The list of body atoms. May be empty.</span>
-<span class="sd">        weights (:obj:`list`): The list of weights of the head atoms. May be empty.</span>
+<span class="sd">        choice (bool): Whether the rule is a choice rule.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        head (:obj:`list`): The list of head atoms. May be empty.</span>
 <span class="sd">        body (:obj:`list`): The list of body atoms. May be empty.</span>
-<span class="sd">        weights (:obj:`list`): The list of weights of the head atoms. May be empty.</span>
+<span class="sd">        choice (bool): Whether the rule is a choice rule.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">choice</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">head</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">body</span> <span class="k">if</span> <span class="n">body</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">choice</span> <span class="o">=</span> <span class="n">choice</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">res</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">res</span> <span class="o">+=</span> <span class="s2">&quot;;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">::</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">))</span> <span class="p">])</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">choice</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">{{</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">res</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -399,22 +464,12 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            :obj:`string`: The representation of this rule as an ASP rule.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">res</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;1</span><span class="se">{{</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span> <span class="nb">str</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="p">])</span><span class="si">}</span><span class="se">}}</span><span class="s2">1&quot;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">res</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">res</span> <span class="o">+=</span><span class="sa">f</span><span class="s2">&quot;:-</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="p">])</span><span class="si">}</span><span class="s2">.&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">res</span> <span class="o">+=</span> <span class="s2">&quot;.&quot;</span>
-        <span class="k">return</span> <span class="n">res</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>A class for probabilistic rules.</p>
+            <div class="docstring"><p>A class for normal rules.</p>
 
 <p>If a rule has more than one atom in the head, the head must be an annotated disjunction.
 Then each of the atoms must have a weight.</p>
@@ -424,31 +479,31 @@ Then each of the atoms must have a weight.</p>
 <p>Args: <br />
     head (<code>list</code>): The list of head atoms. May be empty.
     body (<code>list</code>): The list of body atoms. May be empty.
-    weights (<code>list</code>): The list of weights of the head atoms. May be empty.</p>
+    choice (bool): Whether the rule is a choice rule.</p>
 
 <h6 id="attributes">Attributes</h6>
 
 <ul>
 <li><strong>head (<code>list</code>):</strong>  The list of head atoms. May be empty.</li>
 <li><strong>body (<code>list</code>):</strong>  The list of body atoms. May be empty.</li>
-<li><strong>weights (<code>list</code>):</strong>  The list of weights of the head atoms. May be empty.</li>
+<li><strong>choice (bool):</strong>  Whether the rule is a choice rule.</li>
 </ul>
 </div>
 
 
-                            <div id="ProbabilisticRule.__init__" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ProbabilisticRule.__init__">#&nbsp;&nbsp</a>
+                            <div id="NormalRule.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#NormalRule.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">ProbabilisticRule</span><span class="signature">(head, body, weights)</span>
+            <span class="name">NormalRule</span><span class="signature">(head, body, choice)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">head</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">choice</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">head</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">body</span> <span class="k">if</span> <span class="n">body</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">choice</span> <span class="o">=</span> <span class="n">choice</span>
 </pre></div>
 
         </details>
@@ -456,8 +511,8 @@ Then each of the atoms must have a weight.</p>
     
 
                             </div>
-                            <div id="ProbabilisticRule.asp_string" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ProbabilisticRule.asp_string">#&nbsp;&nbsp</a>
+                            <div id="NormalRule.asp_string" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#NormalRule.asp_string">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
@@ -474,17 +529,151 @@ Then each of the atoms must have a weight.</p>
 <span class="sd">        Returns:</span>
 <span class="sd">            :obj:`string`: The representation of this rule as an ASP rule.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">res</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;1</span><span class="se">{{</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span> <span class="nb">str</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="p">])</span><span class="si">}</span><span class="se">}}</span><span class="s2">1&quot;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">res</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Generates an ASP representation of the rule.</p>
+
+<p>Implements a custom <code>__str__</code> method.</p>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <p><code>string</code>: The representation of this rule as an ASP rule.</p>
+</blockquote>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="WeakConstraint">
+                                <div class="attr class">
+        <a class="headerlink" href="#WeakConstraint">#&nbsp;&nbsp</a>
+
+        
+        <span class="def">class</span>
+        <span class="name">WeakConstraint</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">WeakConstraint</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A class for weak constraints.</span>
+<span class="sd">    </span>
+<span class="sd">    Weak constraints are constraints whose satisfaction is (un)desirable. </span>
+<span class="sd">    This means they have a weight and an empty head.</span>
+<span class="sd">    Furthermore, every weak constraint may have a list of terms associated with it. </span>
+<span class="sd">    The penalty `weight` will be triggered exactly once if any weak constraint with this list of terms</span>
+<span class="sd">    is not satisfied.</span>
+
+<span class="sd">    Implements a custom `__str__` method.</span>
+
+<span class="sd">    Args:        </span>
+<span class="sd">        body (:obj:`list`): The list of body atoms. May be empty.</span>
+<span class="sd">        weight (int): Whether the rule is a choice rule.</span>
+<span class="sd">        terms (:obj:`list`): The list of terms that associated with this constraint. May be empty.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        body (:obj:`list`): The list of body atoms. May be empty.</span>
+<span class="sd">        weight (int): Whether the rule is a choice rule.</span>
+<span class="sd">        terms (:obj:`list`): The list of terms that associated with this constraint. May be empty.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">terms</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">body</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">weight</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terms</span> <span class="o">=</span> <span class="n">terms</span> <span class="k">if</span> <span class="n">terms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="s2">&quot;:~&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">res</span> <span class="o">+=</span><span class="sa">f</span><span class="s2">&quot;:-</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="p">])</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="n">res</span> <span class="o">+=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">body</span><span class="p">])</span><span class="si">}</span><span class="s2">.&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">res</span> <span class="o">+=</span> <span class="s2">&quot;.&quot;</span>
+        <span class="n">res</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="si">}{</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">terms</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;,&#39;</span><span class="si">}{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">terms</span><span class="p">])</span><span class="si">}</span><span class="s2">]&quot;</span>
         <span class="k">return</span> <span class="n">res</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">asp_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates an ASP representation of the rule.</span>
+
+<span class="sd">        Implements a custom `__str__` method.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            :obj:`string`: The representation of this rule as an ASP rule.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>A class for weak constraints.</p>
+
+<p>Weak constraints are constraints whose satisfaction is (un)desirable. 
+This means they have a weight and an empty head.
+Furthermore, every weak constraint may have a list of terms associated with it. 
+The penalty <code>weight</code> will be triggered exactly once if any weak constraint with this list of terms
+is not satisfied.</p>
+
+<p>Implements a custom <code>__str__</code> method.</p>
+
+<p>Args: <br />
+    body (<code>list</code>): The list of body atoms. May be empty.
+    weight (int): Whether the rule is a choice rule.
+    terms (<code>list</code>): The list of terms that associated with this constraint. May be empty.</p>
+
+<h6 id="attributes">Attributes</h6>
+
+<ul>
+<li><strong>body (<code>list</code>):</strong>  The list of body atoms. May be empty.</li>
+<li><strong>weight (int):</strong>  Whether the rule is a choice rule.</li>
+<li><strong>terms (<code>list</code>):</strong>  The list of terms that associated with this constraint. May be empty.</li>
+</ul>
+</div>
+
+
+                            <div id="WeakConstraint.__init__" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#WeakConstraint.__init__">#&nbsp;&nbsp</a>
+
+        
+            <span class="name">WeakConstraint</span><span class="signature">(body, weight, terms)</span>
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">terms</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">body</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weight</span> <span class="o">=</span> <span class="n">weight</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terms</span> <span class="o">=</span> <span class="n">terms</span> <span class="k">if</span> <span class="n">terms</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="WeakConstraint.asp_string" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#WeakConstraint.asp_string">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">asp_string</span><span class="signature">(self)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">asp_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates an ASP representation of the rule.</span>
+
+<span class="sd">        Implements a custom `__str__` method.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns:</span>
+<span class="sd">            :obj:`string`: The representation of this rule as an ASP rule.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -662,19 +851,19 @@ Then each of the atoms must have a weight.</p>
 
                             </div>
                 </section>
-                <section id="ProblogTransformer">
+                <section id="OptProgramTransformer">
                                 <div class="attr class">
-        <a class="headerlink" href="#ProblogTransformer">#&nbsp;&nbsp</a>
+        <a class="headerlink" href="#OptProgramTransformer">#&nbsp;&nbsp</a>
 
         
         <span class="def">class</span>
-        <span class="name">ProblogTransformer</span><wbr>(<span class="base">lark.visitors._Decoratable</span>, <span class="base">abc.ABC</span>, <span class="base">typing.Generic[~_Leaf_T, ~_Return_T]</span>):
+        <span class="name">OptProgramTransformer</span><wbr>(<span class="base">lark.visitors._Decoratable</span>, <span class="base">abc.ABC</span>, <span class="base">typing.Generic[~_Leaf_T, ~_Return_T]</span>):
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">ProblogTransformer</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;The corresponding ProbLog semantics class for the ProbLog grammar GRAMMAR.</span>
+            <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">OptProgramTransformer</span><span class="p">(</span><span class="n">Transformer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The corresponding OptProgram semantics class for the OPTGRAMMAR grammar.</span>
 <span class="sd">    </span>
 <span class="sd">    See the lark documentation for how this works.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -682,33 +871,34 @@ Then each of the atoms must have a weight.</p>
         <span class="k">return</span> <span class="n">ast</span> <span class="c1"># sort out the comments</span>
 
     <span class="k">def</span> <span class="nf">rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span>  <span class="c1"># noqa</span>
-        <span class="k">return</span> <span class="n">ProbabilisticRule</span><span class="p">(</span><span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;head&#39;</span><span class="p">],</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;body&#39;</span><span class="p">],</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;weights&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">fact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span> <span class="c1">#noqa</span>
         <span class="n">ast</span> <span class="o">=</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">ast</span><span class="p">)</span> <span class="o">==</span> <span class="n">Atom</span><span class="p">:</span> <span class="c1"># we found an atom</span>
-            <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;head&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="n">ast</span><span class="p">],</span> <span class="s1">&#39;weights&#39;</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;body&#39;</span> <span class="p">:</span> <span class="kc">None</span> <span class="p">}</span>
-        <span class="k">else</span><span class="p">:</span> <span class="c1"># we found an annotated disjunction</span>
-            <span class="k">return</span> <span class="n">ast</span>
+        <span class="k">return</span> <span class="n">NormalRule</span><span class="p">([</span><span class="n">ast</span><span class="p">[</span><span class="s1">&#39;atom&#39;</span><span class="p">]],</span> <span class="p">[],</span> <span class="n">ast</span><span class="p">[</span><span class="s1">&#39;choice&#39;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">normal_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span>  <span class="c1"># noqa</span>
-        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;head&#39;</span> <span class="p">:</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;head&#39;</span><span class="p">],</span> <span class="s1">&#39;weights&#39;</span> <span class="p">:</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;weights&#39;</span><span class="p">],</span> <span class="s1">&#39;body&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;body&#39;</span><span class="p">]</span> <span class="p">}</span>
-
-    <span class="k">def</span> <span class="nf">annotated_disjunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span> <span class="c1"># noqa</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">ast</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span>
-        <span class="n">head</span> <span class="o">=</span> <span class="n">ast</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span>
-        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;head&#39;</span> <span class="p">:</span> <span class="n">head</span><span class="p">,</span> <span class="s1">&#39;weights&#39;</span> <span class="p">:</span> <span class="n">weights</span><span class="p">,</span> <span class="s1">&#39;body&#39;</span> <span class="p">:</span> <span class="kc">None</span> <span class="p">}</span>
-
+        <span class="k">return</span> <span class="n">NormalRule</span><span class="p">([</span><span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;atom&#39;</span><span class="p">]],</span> <span class="n">ast</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;choice&#39;</span><span class="p">])</span>
+    
+    <span class="k">def</span> <span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span> <span class="c1">#noqa</span>
+        <span class="k">return</span> <span class="n">NormalRule</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">False</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">weakconstraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span> <span class="c1">#noqa</span>
+        <span class="k">return</span> <span class="n">WeakConstraint</span><span class="p">(</span><span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ast</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ast</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    
+    <span class="k">def</span> <span class="nf">head</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ast</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;atom&#39;</span> <span class="p">:</span> <span class="n">ast</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;choice&#39;</span> <span class="p">:</span> <span class="kc">True</span> <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;atom&#39;</span> <span class="p">:</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;choice&#39;</span> <span class="p">:</span> <span class="kc">False</span> <span class="p">}</span>
+    
     <span class="k">def</span> <span class="nf">body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span>  <span class="c1"># noqa</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ast</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">ast</span>
 
-    <span class="k">def</span> <span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span> <span class="c1">#noqa</span>
-        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;head&#39;</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;weights&#39;</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;body&#39;</span> <span class="p">:</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">}</span>
-
     <span class="k">def</span> <span class="nf">atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span>  <span class="c1"># noqa</span>
-        <span class="n">negated</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">+&#39;</span>
+        <span class="n">negated</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="s1">&#39;not&#39;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ast</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">Atom</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ast</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">inputs</span> <span class="o">=</span> <span class="n">ast</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">negated</span> <span class="o">=</span> <span class="n">negated</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -735,14 +925,14 @@ Then each of the atoms must have a weight.</p>
 
         </details>
 
-            <div class="docstring"><p>The corresponding ProbLog semantics class for the ProbLog grammar GRAMMAR.</p>
+            <div class="docstring"><p>The corresponding OptProgram semantics class for the OPTGRAMMAR grammar.</p>
 
 <p>See the lark documentation for how this works.</p>
 </div>
 
 
-                            <div id="ProblogTransformer.program" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ProblogTransformer.program">#&nbsp;&nbsp</a>
+                            <div id="OptProgramTransformer.program" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OptProgramTransformer.program">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
@@ -760,8 +950,8 @@ Then each of the atoms must have a weight.</p>
     
 
                             </div>
-                            <div id="ProblogTransformer.rule" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ProblogTransformer.rule">#&nbsp;&nbsp</a>
+                            <div id="OptProgramTransformer.rule" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OptProgramTransformer.rule">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
@@ -771,7 +961,7 @@ Then each of the atoms must have a weight.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span>  <span class="c1"># noqa</span>
-        <span class="k">return</span> <span class="n">ProbabilisticRule</span><span class="p">(</span><span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;head&#39;</span><span class="p">],</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;body&#39;</span><span class="p">],</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;weights&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 
         </details>
@@ -779,8 +969,8 @@ Then each of the atoms must have a weight.</p>
     
 
                             </div>
-                            <div id="ProblogTransformer.fact" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ProblogTransformer.fact">#&nbsp;&nbsp</a>
+                            <div id="OptProgramTransformer.fact" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OptProgramTransformer.fact">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
@@ -791,10 +981,7 @@ Then each of the atoms must have a weight.</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">fact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span> <span class="c1">#noqa</span>
         <span class="n">ast</span> <span class="o">=</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">ast</span><span class="p">)</span> <span class="o">==</span> <span class="n">Atom</span><span class="p">:</span> <span class="c1"># we found an atom</span>
-            <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;head&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="n">ast</span><span class="p">],</span> <span class="s1">&#39;weights&#39;</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;body&#39;</span> <span class="p">:</span> <span class="kc">None</span> <span class="p">}</span>
-        <span class="k">else</span><span class="p">:</span> <span class="c1"># we found an annotated disjunction</span>
-            <span class="k">return</span> <span class="n">ast</span>
+        <span class="k">return</span> <span class="n">NormalRule</span><span class="p">([</span><span class="n">ast</span><span class="p">[</span><span class="s1">&#39;atom&#39;</span><span class="p">]],</span> <span class="p">[],</span> <span class="n">ast</span><span class="p">[</span><span class="s1">&#39;choice&#39;</span><span class="p">])</span>
 </pre></div>
 
         </details>
@@ -802,8 +989,8 @@ Then each of the atoms must have a weight.</p>
     
 
                             </div>
-                            <div id="ProblogTransformer.normal_rule" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ProblogTransformer.normal_rule">#&nbsp;&nbsp</a>
+                            <div id="OptProgramTransformer.normal_rule" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OptProgramTransformer.normal_rule">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
@@ -813,7 +1000,7 @@ Then each of the atoms must have a weight.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">normal_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span>  <span class="c1"># noqa</span>
-        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;head&#39;</span> <span class="p">:</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;head&#39;</span><span class="p">],</span> <span class="s1">&#39;weights&#39;</span> <span class="p">:</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;weights&#39;</span><span class="p">],</span> <span class="s1">&#39;body&#39;</span><span class="p">:</span> <span class="n">ast</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;body&#39;</span><span class="p">]</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="n">NormalRule</span><span class="p">([</span><span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;atom&#39;</span><span class="p">]],</span> <span class="n">ast</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;choice&#39;</span><span class="p">])</span>
 </pre></div>
 
         </details>
@@ -821,20 +1008,18 @@ Then each of the atoms must have a weight.</p>
     
 
                             </div>
-                            <div id="ProblogTransformer.annotated_disjunction" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ProblogTransformer.annotated_disjunction">#&nbsp;&nbsp</a>
+                            <div id="OptProgramTransformer.constraint" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OptProgramTransformer.constraint">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
-            <span class="name">annotated_disjunction</span><span class="signature">(self, ast)</span>:
+            <span class="name">constraint</span><span class="signature">(self, ast)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">annotated_disjunction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span> <span class="c1"># noqa</span>
-        <span class="n">weights</span> <span class="o">=</span> <span class="n">ast</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span>
-        <span class="n">head</span> <span class="o">=</span> <span class="n">ast</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span>
-        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;head&#39;</span> <span class="p">:</span> <span class="n">head</span><span class="p">,</span> <span class="s1">&#39;weights&#39;</span> <span class="p">:</span> <span class="n">weights</span><span class="p">,</span> <span class="s1">&#39;body&#39;</span> <span class="p">:</span> <span class="kc">None</span> <span class="p">}</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span> <span class="c1">#noqa</span>
+        <span class="k">return</span> <span class="n">NormalRule</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">False</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -842,8 +1027,49 @@ Then each of the atoms must have a weight.</p>
     
 
                             </div>
-                            <div id="ProblogTransformer.body" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ProblogTransformer.body">#&nbsp;&nbsp</a>
+                            <div id="OptProgramTransformer.weakconstraint" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OptProgramTransformer.weakconstraint">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">weakconstraint</span><span class="signature">(self, ast)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">weakconstraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span> <span class="c1">#noqa</span>
+        <span class="k">return</span> <span class="n">WeakConstraint</span><span class="p">(</span><span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ast</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ast</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="OptProgramTransformer.head" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OptProgramTransformer.head">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">head</span><span class="signature">(self, ast)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">head</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ast</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;atom&#39;</span> <span class="p">:</span> <span class="n">ast</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;choice&#39;</span> <span class="p">:</span> <span class="kc">True</span> <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;atom&#39;</span> <span class="p">:</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;choice&#39;</span> <span class="p">:</span> <span class="kc">False</span> <span class="p">}</span>
+</pre></div>
+
+        </details>
+
+    
+
+                            </div>
+                            <div id="OptProgramTransformer.body" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OptProgramTransformer.body">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
@@ -863,27 +1089,8 @@ Then each of the atoms must have a weight.</p>
     
 
                             </div>
-                            <div id="ProblogTransformer.constraint" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ProblogTransformer.constraint">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">constraint</span><span class="signature">(self, ast)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span> <span class="c1">#noqa</span>
-        <span class="k">return</span> <span class="p">{</span> <span class="s1">&#39;head&#39;</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;weights&#39;</span> <span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;body&#39;</span> <span class="p">:</span> <span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">}</span>
-</pre></div>
-
-        </details>
-
-    
-
-                            </div>
-                            <div id="ProblogTransformer.atom" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ProblogTransformer.atom">#&nbsp;&nbsp</a>
+                            <div id="OptProgramTransformer.atom" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OptProgramTransformer.atom">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
@@ -893,7 +1100,7 @@ Then each of the atoms must have a weight.</p>
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">atom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span>  <span class="c1"># noqa</span>
-        <span class="n">negated</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">+&#39;</span>
+        <span class="n">negated</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ast</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="s1">&#39;not&#39;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ast</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">Atom</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">ast</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">inputs</span> <span class="o">=</span> <span class="n">ast</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">negated</span> <span class="o">=</span> <span class="n">negated</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -905,8 +1112,8 @@ Then each of the atoms must have a weight.</p>
     
 
                             </div>
-                            <div id="ProblogTransformer.input" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ProblogTransformer.input">#&nbsp;&nbsp</a>
+                            <div id="OptProgramTransformer.input" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OptProgramTransformer.input">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
@@ -924,8 +1131,8 @@ Then each of the atoms must have a weight.</p>
     
 
                             </div>
-                            <div id="ProblogTransformer.term" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ProblogTransformer.term">#&nbsp;&nbsp</a>
+                            <div id="OptProgramTransformer.term" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OptProgramTransformer.term">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
@@ -949,8 +1156,8 @@ Then each of the atoms must have a weight.</p>
     
 
                             </div>
-                            <div id="ProblogTransformer.variable" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ProblogTransformer.variable">#&nbsp;&nbsp</a>
+                            <div id="OptProgramTransformer.variable" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OptProgramTransformer.variable">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
@@ -968,8 +1175,8 @@ Then each of the atoms must have a weight.</p>
     
 
                             </div>
-                            <div id="ProblogTransformer.weight" class="classattr">
-                                        <div class="attr function"><a class="headerlink" href="#ProblogTransformer.weight">#&nbsp;&nbsp</a>
+                            <div id="OptProgramTransformer.weight" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#OptProgramTransformer.weight">#&nbsp;&nbsp</a>
 
         
             <span class="def">def</span>
@@ -991,8 +1198,8 @@ Then each of the atoms must have a weight.</p>
                                 <h5>Inherited Members</h5>
                                 <dl>
                                     <div><dt>lark.visitors.Transformer</dt>
-                                <dd id="ProblogTransformer.__init__" class="function">Transformer</dd>
-                <dd id="ProblogTransformer.transform" class="function">transform</dd>
+                                <dd id="OptProgramTransformer.__init__" class="function">Transformer</dd>
+                <dd id="OptProgramTransformer.transform" class="function">transform</dd>
 
             </div>
                                 </dl>
