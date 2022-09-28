@@ -819,7 +819,7 @@ class CNF(object):
             start = time.time()
             with os.fdopen(cnf_fd, mode='wb') as cnf_out:
                 self.write_maxsat_cnf(cnf_out)
-            p = subprocess.Popen([os.path.join(src_path, "UWrMaxSAT/uwrmaxsat/build/release/bin/uwrmaxsat"), "-m", "-bm", cnf_tmp], stdout=subprocess.PIPE, close_fds = True)#, stderr=subprocess.PIPE)
+            p = subprocess.Popen([os.path.join(src_path, "UWrMaxSAT/uwrmaxsat/build/release/bin/uwrmaxsat"), "-no-bin", "-no-sat", "-m", "-bm", "-maxpre-time=10", cnf_tmp], stdout=subprocess.PIPE, close_fds = True)#, stderr=subprocess.PIPE)
             solution = None
             while p.poll() is None or solution is None:
                 line = p.stdout.readline().decode()
