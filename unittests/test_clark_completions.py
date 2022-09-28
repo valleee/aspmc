@@ -33,7 +33,7 @@ class TestClarkCompletions(unittest.TestCase):
         cb_none(program)
         self.assertEqual(len(program.get_queries()), 0)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(results[0], 2**100)
 
         control = clingoext.Control()
@@ -42,7 +42,7 @@ class TestClarkCompletions(unittest.TestCase):
         cb_none(program)
         self.assertEqual(len(program.get_queries()), 0)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(results[0], 1)
 
         control = clingoext.Control()
@@ -50,7 +50,7 @@ class TestClarkCompletions(unittest.TestCase):
         program = Program(control)
         cb_none(program)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(results[0], 2)
 
         control = clingoext.Control()
@@ -58,7 +58,7 @@ class TestClarkCompletions(unittest.TestCase):
         program = Program(control)
         cb_none(program)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(results[0], 4)
 
     
@@ -69,7 +69,7 @@ class TestClarkCompletions(unittest.TestCase):
         cb_ors(program)
         self.assertEqual(len(program.get_queries()), 0)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(results[0], 2**100)
 
         control = clingoext.Control()
@@ -78,7 +78,7 @@ class TestClarkCompletions(unittest.TestCase):
         cb_ors(program)
         self.assertEqual(len(program.get_queries()), 0)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(results[0], 1)
 
         control = clingoext.Control()
@@ -86,7 +86,7 @@ class TestClarkCompletions(unittest.TestCase):
         program = Program(control)
         cb_ors(program)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(results[0], 2)
 
         control = clingoext.Control()
@@ -94,7 +94,7 @@ class TestClarkCompletions(unittest.TestCase):
         program = Program(control)
         cb_ors(program)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(results[0], 4)
 
     
@@ -105,7 +105,7 @@ class TestClarkCompletions(unittest.TestCase):
         cb_both(program)
         self.assertEqual(len(program.get_queries()), 0)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(results[0], 2**100)
 
         control = clingoext.Control()
@@ -114,7 +114,7 @@ class TestClarkCompletions(unittest.TestCase):
         cb_both(program)
         self.assertEqual(len(program.get_queries()), 0)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(results[0], 1)
 
         control = clingoext.Control()
@@ -122,7 +122,7 @@ class TestClarkCompletions(unittest.TestCase):
         program = Program(control)
         cb_both(program)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(results[0], 2)
 
         control = clingoext.Control()
@@ -130,7 +130,7 @@ class TestClarkCompletions(unittest.TestCase):
         program = Program(control)
         cb_both(program)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(results[0], 4)
 
 if __name__ == '__main__':

@@ -1,6 +1,3 @@
-- in the cnf module:
-    * replace the compile functionality with an evaluate function, which chooses the correct solving strategy based on the semiring and returns the solution
-    * make it so that compile actually compiles the cnf
 - in the semiring modules make it so that every idempotent semiring supports conversion to a maxsat problem itself
 - find out what causes the error in ./main.py -m problog -c test/test_smokers_10.lp -p -k miniC2D
 - integrate a better fvs solver

@@ -26,7 +26,7 @@ class TestAProblog(unittest.TestCase):
         cb(program)
         self.assertEqual(len(program.get_queries()), 0)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertAlmostEqual(results[0].value, 2)
 
     def test_maxplus_either(self):
@@ -35,7 +35,7 @@ class TestAProblog(unittest.TestCase):
         cb(program)
         self.assertEqual(len(program.get_queries()), 0)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertAlmostEqual(results[0].value, 2)
 
     
@@ -45,7 +45,7 @@ class TestAProblog(unittest.TestCase):
         cb(program)
         self.assertEqual(len(program.get_queries()), 0)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertAlmostEqual(results[0].value, 0.5)
 
 

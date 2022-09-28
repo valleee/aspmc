@@ -24,7 +24,7 @@ class TestSMProblog(unittest.TestCase):
         cb(program)
         self.assertEqual(len(program.get_queries()), 8)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(len(results), 8)
         expected = {
             "smokes(4)" : 0.07085800200242828,
@@ -46,7 +46,7 @@ class TestSMProblog(unittest.TestCase):
         cnf = program.get_cnf()
         config.config["knowledge_compiler"] = "c2d"
         config.config["constrained"] = "XD"
-        results = cnf.compile()
+        results = cnf.evaluate()
         defined = cnf.get_defined(cnf.quantified[0])
         self.assertEqual(len(defined) + len(cnf.quantified[0]), cnf.nr_vars)
         self.assertEqual(len(results), 10)
@@ -59,7 +59,7 @@ class TestSMProblog(unittest.TestCase):
             self.assertAlmostEqual(results[i], expected[i])
         config.config["knowledge_compiler"] = "miniC2D"
         config.config["constrained"] = "XD"
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(len(results), 10)
         for i in range(10):
             self.assertAlmostEqual(results[i], expected[i])
@@ -71,7 +71,7 @@ class TestSMProblog(unittest.TestCase):
         cnf = program.get_cnf()
         config.config["knowledge_compiler"] = "c2d"
         config.config["constrained"] = "X"
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(len(results), 1)
         expected = {
             "c" : 0.7
@@ -80,7 +80,7 @@ class TestSMProblog(unittest.TestCase):
             self.assertAlmostEqual(results[i], expected[query])
         config.config["knowledge_compiler"] = "miniC2D"
         config.config["constrained"] = "X"
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(len(results), 1)
         for i, query in enumerate(program.get_queries()):
             self.assertAlmostEqual(results[i], expected[query])

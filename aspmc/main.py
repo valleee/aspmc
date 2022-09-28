@@ -287,14 +287,13 @@ def main():
     if not count:
         exit(0)
 
-    if mode == "mpeproblog" or mode == "optasp":
-        weight, solution = cnf.solve_maxsat()
-        weight = weight[0]
-        assignment = ", ".join([ program._external_name(v) for v in program._guess if v in solution ])
-        logger.result(f"The overall weight of the program is {weight}")# with {assignment}")
-        return
-    # compile the cnf into a tractable circuit representation and perform the (algebraic) model counting
-    results = cnf.compile(preprocessing)
+    # if mode == "mpeproblog" or mode == "optasp":
+    #     weight, solution = cnf.solve_maxsat()
+    #     weight = weight[0]
+    #     assignment = ", ".join([ program._external_name(v) for v in program._guess if v in solution ])
+    #     logger.result(f"The overall weight of the program is {weight}")# with {assignment}")
+    #     return
+    results = cnf.evaluate(strategy = "flexible", preprocessing = preprocessing)
 
     # print the results
     logger.info("   Results")

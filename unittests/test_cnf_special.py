@@ -21,7 +21,7 @@ class TestCNFSpecial(unittest.TestCase):
         for kc in compilers_single:
             try:
                 config.config["knowledge_compiler"] = kc
-                results = cnf.compile()
+                results = cnf.evaluate()
                 self.assertEqual(len(results), 1)
                 self.assertEqual(results[0], 1)
             except:
@@ -33,7 +33,7 @@ class TestCNFSpecial(unittest.TestCase):
         for kc in compilers_single:
             try:
                 config.config["knowledge_compiler"] = kc
-                results = cnf.compile()
+                results = cnf.evaluate()
                 self.assertEqual(len(results), 1)
                 self.assertEqual(results[0], 2**5)
             except:
@@ -46,7 +46,7 @@ class TestCNFSpecial(unittest.TestCase):
         for kc in compilers_single:
             try:
                 config.config["knowledge_compiler"] = kc
-                results = cnf.compile()
+                results = cnf.evaluate()
                 self.assertEqual(len(results), 1)
                 self.assertEqual(results[0], 2**5 - 1)
             except:
@@ -59,7 +59,7 @@ class TestCNFSpecial(unittest.TestCase):
         for kc in compilers_single:
             try:
                 config.config["knowledge_compiler"] = kc
-                results = cnf.compile()
+                results = cnf.evaluate()
                 self.assertEqual(len(results), 1)
                 self.assertEqual(results[0], 2)
             except:
@@ -73,7 +73,7 @@ class TestCNFSpecial(unittest.TestCase):
         for kc in compilers_single:
             try:
                 config.config["knowledge_compiler"] = kc
-                results = cnf.compile()
+                results = cnf.evaluate()
                 self.assertEqual(len(results), 1)
                 self.assertEqual(results[0], 0)
             except:
@@ -96,7 +96,7 @@ class TestCNFSpecial(unittest.TestCase):
             try:
                 config.config["knowledge_compiler"] = kc
                 config.config["constrained"] = "XD"
-                results = cnf.compile()
+                results = cnf.evaluate()
                 self.assertEqual(len(results), 1)
                 self.assertEqual(results[0], 1)
             except:
@@ -109,7 +109,7 @@ class TestCNFSpecial(unittest.TestCase):
         for kc in compilers_single:
             try:
                 config.config["knowledge_compiler"] = kc
-                results = cnf.compile()
+                results = cnf.evaluate()
                 self.assertEqual(len(results), 1)
                 self.assertEqual(results[0], 1)
             except:

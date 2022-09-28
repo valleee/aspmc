@@ -25,7 +25,7 @@ class TestASP(unittest.TestCase):
         cb(program)
         self.assertEqual(len(program.get_queries()), 0)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(results[0], 2**100)
 
     def test_constraint(self):
@@ -35,7 +35,7 @@ class TestASP(unittest.TestCase):
         cb(program)
         self.assertEqual(len(program.get_queries()), 0)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(results[0], 1)
 
     def test_cycle(self):
@@ -44,7 +44,7 @@ class TestASP(unittest.TestCase):
         program = Program(control)
         cb(program)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(results[0], 2)
 
     def test_cycle2(self):
@@ -53,7 +53,7 @@ class TestASP(unittest.TestCase):
         program = Program(control)
         cb(program)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(results[0], 4)
 
     def test_removed_query(self):
@@ -63,7 +63,7 @@ class TestASP(unittest.TestCase):
         cb(program)
         self.assertEqual(len(program.get_queries()), 1)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(results[0], 2)
 
 if __name__ == '__main__':

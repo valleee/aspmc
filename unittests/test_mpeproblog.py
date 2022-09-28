@@ -18,7 +18,7 @@ class TestMPEProblog(unittest.TestCase):
         program.tpUnfold()
         program.td_guided_both_clark_completion()
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(len(results), 1)
         expected = 0.00014718216123410307
         self.assertAlmostEqual(results[0].value, expected)
@@ -28,7 +28,7 @@ class TestMPEProblog(unittest.TestCase):
         program.binary_cycle_breaking(local=False)
         program.td_guided_both_clark_completion()
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(len(results), 1)
         expected = 0.00014718216123410307
         self.assertAlmostEqual(results[0].value, expected)
@@ -36,7 +36,7 @@ class TestMPEProblog(unittest.TestCase):
         program.binary_cycle_breaking(local=True)
         program.td_guided_both_clark_completion()
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(len(results), 1)
         expected = 0.00014718216123410307
         self.assertAlmostEqual(results[0].value, expected)
@@ -47,7 +47,7 @@ class TestMPEProblog(unittest.TestCase):
         program.less_than_cycle_breaking(opt=False)
         program.td_guided_both_clark_completion()
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(len(results), 1)
         expected = 0.00014718216123410307
         self.assertAlmostEqual(results[0].value, expected)
@@ -55,7 +55,7 @@ class TestMPEProblog(unittest.TestCase):
         program.less_than_cycle_breaking(opt=True)
         program.td_guided_both_clark_completion()
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(len(results), 1)
         expected = 0.00014718216123410307
         self.assertAlmostEqual(results[0].value, expected)

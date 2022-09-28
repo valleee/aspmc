@@ -24,7 +24,7 @@ class TestMEUProblog(unittest.TestCase):
         cb(program)
         self.assertEqual(len(program.get_queries()), 0)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(len(results), 1)
         self.assertAlmostEqual(results[0].value, 6.0)
         self.assertEqual(results[0].decisions, 3)

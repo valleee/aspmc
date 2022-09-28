@@ -25,7 +25,7 @@ class TestProblog(unittest.TestCase):
         cb(program)
         self.assertEqual(len(program.get_queries()), 1)
         cnf = program.get_cnf()
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertAlmostEqual(results[0], 0.75)
 
     def test_smokers_10_or_guide(self):
@@ -34,7 +34,7 @@ class TestProblog(unittest.TestCase):
         self.assertEqual(len(program.get_queries()), 10)
         cnf = program.get_cnf()
         config.config["knowledge_compiler"] = "c2d"
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(len(results), 10)
         expected = [ 
             0.845642576843858, 0.7061644677402408, 0.9080926252529147, 0.9060131023306259,
@@ -45,7 +45,7 @@ class TestProblog(unittest.TestCase):
             self.assertAlmostEqual(results[i], expected[i])
 
         config.config["knowledge_compiler"] = "miniC2D"
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(len(results), 10)
         for i in range(10):
             self.assertAlmostEqual(results[i], expected[i])
@@ -57,7 +57,7 @@ class TestProblog(unittest.TestCase):
         self.assertEqual(len(program.get_queries()), 10)
         cnf = program.get_cnf()
         config.config["knowledge_compiler"] = "c2d"
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(len(results), 10)
         expected = [ 
             0.845642576843858, 0.7061644677402408, 0.9080926252529147, 0.9060131023306259,
@@ -68,7 +68,7 @@ class TestProblog(unittest.TestCase):
             self.assertAlmostEqual(results[i], expected[i])
 
         config.config["knowledge_compiler"] = "miniC2D"
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(len(results), 10)
         for i in range(10):
             self.assertAlmostEqual(results[i], expected[i])
@@ -80,7 +80,7 @@ class TestProblog(unittest.TestCase):
         self.assertEqual(len(program.get_queries()), 10)
         cnf = program.get_cnf()
         config.config["knowledge_compiler"] = "c2d"
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(len(results), 10)
         expected = [ 
             0.845642576843858, 0.7061644677402408, 0.9080926252529147, 0.9060131023306259,
@@ -91,7 +91,7 @@ class TestProblog(unittest.TestCase):
             self.assertAlmostEqual(results[i], expected[i])
 
         config.config["knowledge_compiler"] = "miniC2D"
-        results = cnf.compile()
+        results = cnf.evaluate()
         self.assertEqual(len(results), 10)
         for i in range(10):
             self.assertAlmostEqual(results[i], expected[i])
