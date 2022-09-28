@@ -903,11 +903,13 @@ class Program(object):
             nodes[atom] = (INPUT, set())
 
         seen = set()
-        for r in self._program:
-            if len(r.body) == 0: # special case for facts
-                self._cnf.clauses.append([r.head[0]])
-                seen.add(r.head[0])
-                continue
+        facts = set([ r.head[0] for r in self._program if len(r.body) == 0 ])
+        for f in facts:
+            self._cnf.clauses.append([f])
+        seen.update(facts)
+        
+        remaining = [ r for r in self._program if len(r.head) == 0 or r.head[0] not in facts ]
+        for r in remaining:
             r.proven = self._new_var(f"{r}")
             if len(r.head) != 0:
                 nodes[r.proven] = (AND, set(r.body))
@@ -924,7 +926,7 @@ class Program(object):
         # set up the and/or graph
         graph = nx.Graph()
         graph.add_nodes_from(range(1, self._max + 1))
-        for r in self._program:
+        for r in remaining:
             if len(r.body) > 0:
                 for atom in r.head:
                     graph.add_edge(r.proven, atom)

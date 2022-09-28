@@ -103,7 +103,7 @@ class OptProgram(Program):
                 if head_name.startswith(INTERNAL_PENALTY):
                     # find out the penalty of this atom
                     idx = head_name.rfind(",")
-                    penalty = semiring.MinPlusFloat(int(head_name[idx+1:-1]))
+                    penalty = semiring.MinPlusFloat(float(head_name[idx+1:-1]))
                     self.weights[head_name] = penalty
                 
 

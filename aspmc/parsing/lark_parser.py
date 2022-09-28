@@ -144,6 +144,8 @@ class ProblogTransformer(Transformer):
         return { 'head' : head, 'weights' : weights, 'body' : None }
 
     def body(self, ast):  # noqa
+        if len(ast) == 1 and ast[0] == None:
+            return None
         return ast
 
     def constraint(self, ast): #noqa
@@ -187,7 +189,7 @@ GRAMMAR = r'''
 
     constraint : ":-" body
 
-    body : atom ( "," atom )*
+    body : [ atom ( "," atom )* ]
 
     NEGATION : "\+"
 

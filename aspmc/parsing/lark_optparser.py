@@ -190,6 +190,8 @@ class OptProgramTransformer(Transformer):
             return { 'atom' : ast[0], 'choice' : False }
     
     def body(self, ast):  # noqa
+        if len(ast) == 1 and ast[0] == None:
+            return None
         return ast
 
     def atom(self, ast):  # noqa
@@ -233,7 +235,7 @@ GRAMMAR = r'''
 
     head : ( atom | (OPEN_ANGLE atom CLOSED_ANGLE) )
 
-    body : atom ( "," atom )*
+    body : [ atom ( "," atom )* ]
 
     OPEN_ANGLE : "{"
     

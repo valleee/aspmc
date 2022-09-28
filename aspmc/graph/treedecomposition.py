@@ -323,10 +323,10 @@ def from_graph(graph, solver = "flow-cutter", timeout = "1"):
         p = subprocess.Popen([os.path.join(src_path, "flow-cutter/flow_cutter_pace17")], stdin=subprocess.PIPE, stdout=subprocess.PIPE, close_fds = True)
     else:
         logger.error(f"Unknown td-solver {solver}")    
-    #with open("debug.gr", "wb") as debug_gr:
-    #    debug_gr.write(f"p tw {len(graph.nodes)} {len(graph.edges)}\n".encode())
-    #    for (v,vp) in graph.edges:
-    #        debug_gr.write(f"{node_map[v]} {node_map[vp]}\n".encode())
+    with open("debug.gr", "wb") as debug_gr:
+       debug_gr.write(f"p tw {len(graph.nodes)} {len(graph.edges)}\n".encode())
+       for (v,vp) in graph.edges:
+           debug_gr.write(f"{node_map[v]} {node_map[vp]}\n".encode())
     p.stdin.write(f"p tw {len(graph.nodes)} {len(graph.edges)}\n".encode())
     for (v,vp) in graph.edges:
         p.stdin.write(f"{node_map[v]} {node_map[vp]}\n".encode())
@@ -335,7 +335,7 @@ def from_graph(graph, solver = "flow-cutter", timeout = "1"):
     first = False
     while p.poll() is None and not first:
         line = p.stdout.readline().decode()
-        first = line.startswith("c run")
+        first = line.startswith("c status")
     time_left = timeout - (time.time() - start)
     try:
         p.wait(time_left)

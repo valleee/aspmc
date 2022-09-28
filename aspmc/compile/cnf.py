@@ -164,6 +164,9 @@ class CNF(object):
         elif self.semirings[0].__name__ == "aspmc.semirings.minplus":
             # we first need to convert into maxplus weights
             real_weights = { l : -w if w != float("inf") else float("-inf") for l,w in real_weights.items() }
+        elif self.semirings[0].__name__ != "aspmc.semirings.maxplus":
+            logger.error(f"MaxSAT evaluation is currently not supported for semiring {self.semirings[0].__name__}")
+            exit(-1)
         # sort out variables that are irrelevant
         real_weights = { l : w for l,w in real_weights.items() if w != real_weights[-l]}
         # handle hard constraints from literals with weight -inf and keep the rest
@@ -217,11 +220,6 @@ class CNF(object):
         #    c.weights[l] = np.array([maxplus.MaxPlusFloat(-w)])
         #c.nr_vars = self.nr_vars
         #print(c)
-
-
-
-                        
-
 
 
     def get_defined(self, P, timeout = "150"):
@@ -706,7 +704,7 @@ class CNF(object):
         The strategy can be one of 
             * `"flexible"`: do what is assumed best. 
                 Currently, uses maxsat for idempotent semirings and knowledge compilation otherwise.
-            * `"compile"`: compile regardless of the properties of the semiring.
+            * `"compilation"`: compile regardless of the properties of the semiring.
 
         Calls `solve_compilation` or `solve_maxsat` depending on the problem and strategy.
         How the tree decompositions are generated and which knowledge compiler/maxsat solver is used is configured in aspmc.config.
@@ -721,7 +719,7 @@ class CNF(object):
                 return self.solve_maxsat()
             else:
                 return self.solve_compilation(preprocessing = preprocessing)
-        elif strategy == "compile":
+        elif strategy == "compilation":
             return self.solve_compilation(preprocessing = preprocessing)
         else: 
             logger.error(f"Unknown evaluation strategy {strategy}.")
@@ -766,6 +764,12 @@ class CNF(object):
         if self.semirings[0].__name__ == "aspmc.semirings.maxtimes":
             # we first need to convert into maxplus weights
             real_weights = { l : math.log(w) if w > 0 else float("-inf") for l,w in real_weights.items() }
+        elif self.semirings[0].__name__ == "aspmc.semirings.minplus":
+            # we first need to convert into maxplus weights
+            real_weights = { l : -w if w != float("inf") else float("-inf") for l,w in real_weights.items() }
+        elif self.semirings[0].__name__ != "aspmc.semirings.maxplus":
+            logger.error(f"MaxSAT evaluation is currently not supported for semiring {self.semirings[0].__name__}")
+            exit(-1)
         # sort out variables that are irrelevant
         real_weights = { l : w for l,w in real_weights.items() if w != real_weights[-l]}
         # handle hard constraints from literals with weight -inf and keep the rest

@@ -19,6 +19,8 @@ from aspmc.programs.mapprogram import MAPProblogProgram
 from aspmc.programs.mpeprogram import MPEProblogProgram
 from aspmc.programs.optprogram import OptProgram
 
+from aspmc.compile.cnf import CNF
+
 
 import aspmc.config as config
 
@@ -148,7 +150,7 @@ def main():
             if sys.argv[1] == "-m" or sys.argv[1] == "--mode":
                 mode = sys.argv[2]
                 if mode != "problog" and mode != "asp" and mode != "smproblog" and mode != "meuproblog" \
-                    and mode != "mapproblog" and mode != "mpeproblog" and mode != "optasp":
+                    and mode != "mapproblog" and mode != "mpeproblog" and mode != "optasp" and mode != "cnf":
                     logger.error("  Unknown mode: " + mode)
                     exit(-1)
                 del sys.argv[1:3]
@@ -236,53 +238,56 @@ def main():
         program = MPEProblogProgram(program_str, program_files)
     elif mode == "optasp":
         program = OptProgram(program_str, program_files)
+    elif mode == "cnf":
+        cnf = CNF(program_files[0])
     else:
         program = Program(program_str = program_str, program_files = program_files)
 
-    # perform the cycle breaking
-    logger.info("   Stats Original")
-    logger.info("------------------------------------------------------------")
-    program._decomposeGraph()
-    logger.info("------------------------------------------------------------")
-    if no_pp and write_name:
-        with open(f'{write_name}.lp', mode='wb') as file_out:
-            program.write_prog(file_out)
-            exit(0)
-    if cycle_breaking == "tp":
-        program.tpUnfold()
-    elif cycle_breaking == "binary":
-        program.binary_cycle_breaking(local=False)
-    elif cycle_breaking == "binary-opt":
-        program.binary_cycle_breaking(local=True)
-    elif cycle_breaking == "lt":
-        program.less_than_cycle_breaking(opt=False)
-    elif cycle_breaking == "lt-opt":
-        program.less_than_cycle_breaking(opt=True)
-    
-    logger.info("   Cycle Breaking Done")
-    logger.info("------------------------------------------------------------")
-    if write_name:
-        with open(f'{write_name}.lp', mode='wb') as file_out:
-            program.write_prog(file_out, spanning=True)
-    logger.info("   Stats After Cycle Breaking")
-    logger.info("------------------------------------------------------------")
-    if guide == "none":
-        program.clark_completion()
-    elif guide == "ors":
-        program.td_guided_clark_completion()
-    else:
-        program.td_guided_both_clark_completion()
-    logger.info("------------------------------------------------------------")
-    if write_name:
-        with open(f'{write_name}.cnf', mode='wb') as file_out:
-            program.write_dimacs(file_out)
+    if mode != "cnf":
+        # perform the cycle breaking
+        logger.info("   Stats Original")
+        logger.info("------------------------------------------------------------")
+        program._decomposeGraph()
+        logger.info("------------------------------------------------------------")
+        if no_pp and write_name:
+            with open(f'{write_name}.lp', mode='wb') as file_out:
+                program.write_prog(file_out)
+                exit(0)
+        if cycle_breaking == "tp":
+            program.tpUnfold()
+        elif cycle_breaking == "binary":
+            program.binary_cycle_breaking(local=False)
+        elif cycle_breaking == "binary-opt":
+            program.binary_cycle_breaking(local=True)
+        elif cycle_breaking == "lt":
+            program.less_than_cycle_breaking(opt=False)
+        elif cycle_breaking == "lt-opt":
+            program.less_than_cycle_breaking(opt=True)
+        
+        logger.info("   Cycle Breaking Done")
+        logger.info("------------------------------------------------------------")
+        if write_name:
+            with open(f'{write_name}.lp', mode='wb') as file_out:
+                program.write_prog(file_out, spanning=True)
+        logger.info("   Stats After Cycle Breaking")
+        logger.info("------------------------------------------------------------")
+        if guide == "none":
+            program.clark_completion()
+        elif guide == "ors":
+            program.td_guided_clark_completion()
+        else:
+            program.td_guided_both_clark_completion()
+        logger.info("------------------------------------------------------------")
+        if write_name:
+            with open(f'{write_name}.cnf', mode='wb') as file_out:
+                program.write_dimacs(file_out)
 
-    cnf = program.get_cnf()
-    if treewidth:
-        logger.info("   Stats CNF")
-        logger.info("------------------------------------------------------------")
-        program.encoding_stats()
-        logger.info("------------------------------------------------------------")
+        cnf = program.get_cnf()
+        if treewidth:
+            logger.info("   Stats CNF")
+            logger.info("------------------------------------------------------------")
+            program.encoding_stats()
+            logger.info("------------------------------------------------------------")
 
     if not count:
         exit(0)
@@ -298,7 +303,10 @@ def main():
     # print the results
     logger.info("   Results")
     logger.info("------------------------------------------------------------")
-    queries = program.get_queries()
+    if mode != "cnf":
+        queries = program.get_queries()
+    else:
+        queries = []
     if len(queries) > 0:
         for i,query in enumerate(queries):
             logger.result(f"{query}: {' '*max(1,(20 - len(query)))}{results[i]}")
