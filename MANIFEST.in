@@ -27,3 +27,9 @@ include aspmc/external/preprocessor/bin/flow_cutter_pace17
 include aspmc/external/preprocessor/LICENSE
 include aspmc/external/preprocessor/flowcutter/LICENSE
 include aspmc/external/preprocessor/src/clhash/LICENSE
+
+include aspmc/external/UWrMaxSAT/uwrmaxsat/build/release/bin/uwrmaxsat
+include aspmc/external/UWrMaxSAT/uwrmaxsat/LICENSE
+
+include aspmc/external/fvs/src/build/FeedbackVertexSet
+include aspmc/external/fvs/LICENSE

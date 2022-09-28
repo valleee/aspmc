@@ -137,3 +137,9 @@ class OptProgram(Program):
 
     def get_queries(self):
         return []
+
+    # def solve_clingo(self):
+    #     import clingo
+    #     control = clingo.Control()
+    #     control.add("base", [], self._prog_string(self._program))
+    #     control.ground([('base', [])])

@@ -82,7 +82,7 @@ logger.setLevel(logging.INFO)
 
 help_string = """
 aspmc: An Algebraic Answer Set Counter
-aspmc version 1.0.0, May 2, 2022
+aspmc version 1.0.2, Sep 28, 2022
 
 python main.py [-m .] [-c] [-s .] [-n] [-t] [-ds .] [-dt .] [-k .] [-g .] [-b .] [-h] [<INPUT-FILES>]
     --mode              -m  MODE        set input mode to MODE:
