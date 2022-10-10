@@ -112,7 +112,8 @@ python main.py [-m .] [-c] [-s .] [-n] [-t] [-ds .] [-dt .] [-k .] [-g .] [-b .]
     --guide_clark       -g  GUIDE       set the tree decomposition type to use to guide the clark completion to GUIDE:
                                         * none              : preform the normal clark completion without guidance
                                         * ors               : guide for or nodes only 
-                                        * both              : guide for both `and` and `or` nodes (default)
+                                        * both              : guide for both `and` and `or` nodes 
+                                        * adaptive          : guide `both` that takes into account the cost of auxilliary variables (default)
     --cycle-breaking    -b  STRATEGY    set the cycle-breaking strategy to STRATEGY:
                                         * none              : do not perform cycle-breaking, not suitable for model counting
                                         * tp                : perform tp-unfolding, suitable for model counting (default)
@@ -142,7 +143,7 @@ def main():
     write_name = ""
     treewidth = False
     semiring_string = "aspmc.semirings.probabilistic"
-    guide = "both"
+    guide = "adaptive"
 
     # parse the arguments
     while len(sys.argv) > 1:
@@ -204,7 +205,7 @@ def main():
                 del sys.argv[1:3]
             elif sys.argv[1] == "-g" or sys.argv[1] == "--guide_clark":
                 guide = sys.argv[2]
-                if sys.argv[2] != "none" and sys.argv[2] != "ors" and sys.argv[2] != "both":
+                if sys.argv[2] != "none" and sys.argv[2] != "ors" and sys.argv[2] != "both" and sys.argv[2] != "adaptive":
                     logger.error("  Unknown guide: " + sys.argv[2])
                     exit(-1)
                 del sys.argv[1:3]
@@ -275,8 +276,10 @@ def main():
             program.clark_completion()
         elif guide == "ors":
             program.td_guided_clark_completion()
-        else:
+        elif guide == "both":
             program.td_guided_both_clark_completion()
+        elif guide == "adaptive":
+            program.td_guided_adaptive_clark_completion()
         logger.info("------------------------------------------------------------")
         if write_name:
             with open(f'{write_name}.cnf', mode='wb') as file_out:

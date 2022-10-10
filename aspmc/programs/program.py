@@ -1138,6 +1138,283 @@ class Program(object):
 
         self._cnf.nr_vars = self._max
         self._finalize_cnf()
+    
+    def td_guided_adaptive_clark_completion(self):        
+        """Applies the clark completion to the program. 
+
+        Does not check whether the program is tight! 
+        Use tree decomposition guidance on both the "ands" and the "ors"
+        to obtain a program of possibly smaller treewidth. 
+        Explicitly adds the cost of auxillary variables to the tree decomposition computation.
+        
+        Does not return anything only constructs the cnf.
+        The CNF can be obtained by using `get_cnf()`.
+
+        The solver to compute the tree decomposition and its timeout can be specified in 
+        aspmc.config.
+
+        Returns:
+            None        
+        """
+        self._cnf = CNF()
+        # remember whats an and, whats an or and whats a constraint
+        # also include the guesses, which guess exactly one of their inputs to be true
+        OR = 0
+        AND = 1
+        CON = 2
+        GUESS = 3
+        INPUT = 4
+        nodes = { a : (OR, set()) for a in self._deriv }
+
+        exactly_one_to_var = {}
+        for a in self._exactlyOneOf:
+            exactly_one_to_var[a] = self._new_var(f"{a}")
+            nodes[exactly_one_to_var[a]] = (GUESS, set(a))
+
+        for atom in self._guess:
+            nodes[atom] = (INPUT, set())
+
+        seen = set()
+        facts = set([ r.head[0] for r in self._program if len(r.body) == 0 ])
+        for f in facts:
+            self._cnf.clauses.append([f])
+        seen.update(facts)
+        
+        remaining = [ r for r in self._program if len(r.head) == 0 or r.head[0] not in facts ]
+        for r in remaining:
+            r.proven = self._new_var(f"{r}")
+            if len(r.head) != 0:
+                nodes[r.proven] = (AND, set(r.body))
+                nodes[abs(r.head[0])][1].add(r.proven)
+                seen.add(r.head[0])
+            else:
+                nodes[r.proven] = (CON, set([ -atom for atom in r.body ]))
+
+        # handle the atoms that do not occur in the head of any rule
+        falses = [ a for a in self._deriv if a not in seen and nodes[a][0] == OR and len(nodes[a][1]) == 0 ]
+        for f in falses:
+            self._cnf.clauses.append([-f])
+
+        # set up the and/or graph
+        graph = nx.Graph()
+        graph.add_nodes_from(range(1, self._max + 1))
+        for r in remaining:
+            if len(r.body) > 0:
+                for atom in r.head:
+                    graph.add_edge(atom, r.proven)
+                    graph.add_edge(atom + self._max, r.proven)
+                for atom in r.body:
+                    graph.add_edge(r.proven, abs(atom))
+                    graph.add_edge(r.proven + self._max, abs(atom))
+        
+        for a in self._exactlyOneOf:
+            for atom in a:
+                graph.add_edge(exactly_one_to_var[a], atom)
+                graph.add_edge(exactly_one_to_var[a] + self._max, atom)
+
+
+        td = treedecomposition.from_graph(graph, solver = config.config["decos"], timeout = config.config["decot"])
+        td.remove(set(range(self._max + 1, 2*self._max + 1)))
+        td.vertices = self._max 
+        logger.info(f"Tree Decomposition #bags: {td.bags} treewidth: {td.width} #vertices: {td.vertices}")
+        
+        # remember per bag which nodes have which partial result
+        unfinished = {}
+        # handle the bags in dfs order
+        for t in td.bag_iter():
+            unfinished[t] = {}
+            # first take care of what we got from the children
+            for tp in t.children:
+                for atom in unfinished[tp]:
+                    if atom not in unfinished[t]:
+                        unfinished[t][atom] = unfinished[tp][atom]
+                    else:
+                        if len(unfinished[tp][atom]) == 1:
+                            first_lit = unfinished[tp][atom].pop()
+                        else:
+                            node_type = nodes[atom][0]
+                            first_lit = self._new_var("")
+                            if node_type == AND:
+                                bigAnd = [ first_lit ] + [ -v for v in unfinished[tp][atom] ]
+                                self._cnf.clauses.append(bigAnd)                  
+                                for v in unfinished[tp][atom]:
+                                    self._cnf.clauses.append([ -first_lit, v ])
+                            elif node_type == OR or node_type == CON:
+                                bigOr = [ -first_lit ] + [ v for v in unfinished[tp][atom] ]
+                                self._cnf.clauses.append(bigOr)
+                                for v in unfinished[tp][atom]:
+                                    self._cnf.clauses.append([ first_lit, -v ])
+                            elif node_type == GUESS:
+                                # remember in first_lit, whether one of the unfinished atoms is true
+                                bigOr = [ -first_lit ] + [ v for v in unfinished[tp][atom] ]
+                                self._cnf.clauses.append(bigOr)
+                                for v in unfinished[tp][atom]:
+                                    self._cnf.clauses.append([ first_lit, -v ])
+                                # make sure that not more than one of the unfinished atoms is true
+                                for v in unfinished[tp][atom]:
+                                    for vp in unfinished[tp][atom]:
+                                        if v < vp:
+                                            self._cnf.clauses.append([-v, -vp])
+
+                        if len(unfinished[t][atom]) == 1:
+                            second_lit = unfinished[t][atom].pop()
+                        else:
+                            node_type = nodes[atom][0]
+                            second_lit = self._new_var("")
+                            if node_type == AND:
+                                bigAnd = [ second_lit ] + [ -v for v in unfinished[t][atom] ]
+                                self._cnf.clauses.append(bigAnd)
+                                for v in unfinished[t][atom]:
+                                    self._cnf.clauses.append([ -second_lit, v ])
+                            elif node_type == OR or node_type == CON:
+                                bigOr = [ -second_lit ] + [ v for v in unfinished[t][atom] ]
+                                self._cnf.clauses.append(bigOr)
+                                for v in unfinished[t][atom]:
+                                    self._cnf.clauses.append([ second_lit, -v ])
+                            elif node_type == GUESS:
+                                # remember in second_lit, whether one of the unfinished atoms is true
+                                bigOr = [ -second_lit ] + [ v for v in unfinished[t][atom] ]
+                                self._cnf.clauses.append(bigOr)
+                                for v in unfinished[t][atom]:
+                                    self._cnf.clauses.append([ second_lit, -v ])
+                                # make sure that not more than one of the unfinished atoms is true
+                                for v in unfinished[t][atom]:
+                                    for vp in unfinished[t][atom]:
+                                        if v < vp:
+                                            self._cnf.clauses.append([-v, -vp])
+
+                        unfinished[t][atom] = set([first_lit, second_lit])
+                        
+            # then take care of the current bag
+            for a in t.vertices:
+                node_type, inputs = nodes[a]
+                todo_new = set([ atom for atom in inputs if abs(atom) in t.vertices ])
+                if len(todo_new) == 0:
+                    continue
+                inputs.difference_update(todo_new)
+                if a not in unfinished[t]:
+                    unfinished[t][a] = todo_new
+                else:
+                    if len(unfinished[t][a]) == 1:
+                        first_lit = unfinished[t][a].pop()
+                    else:
+                        first_lit = self._new_var("")
+                        if node_type == AND:
+                            bigAnd = [ first_lit ] + [ -v for v in unfinished[t][a] ]
+                            self._cnf.clauses.append(bigAnd)
+                            for v in unfinished[t][a]:
+                                self._cnf.clauses.append([ -first_lit, v ])
+                        elif node_type == OR or node_type == CON:
+                            bigOr = [ -first_lit ] + [ v for v in unfinished[t][a] ]
+                            self._cnf.clauses.append(bigOr)
+                            for v in unfinished[t][a]:
+                                self._cnf.clauses.append([ first_lit, -v ])
+                        elif node_type == GUESS:
+                            # remember in first_lit, whether one of the unfinished atoms is true
+                            bigOr = [ -first_lit ] + [ v for v in unfinished[t][a] ]
+                            self._cnf.clauses.append(bigOr)
+                            for v in unfinished[t][a]:
+                                self._cnf.clauses.append([ first_lit, -v ])
+                            # make sure that not more than one of the unfinished atoms is true
+                            for v in unfinished[t][a]:
+                                for vp in unfinished[t][a]:
+                                    if v < vp:
+                                        self._cnf.clauses.append([-v, -vp])
+
+                    if len(todo_new) == 1:
+                        second_lit = todo_new.pop()
+                    else:
+                        second_lit = self._new_var("")
+                        if node_type == AND:
+                            bigAnd = [ second_lit ] + [ -v for v in todo_new ]
+                            self._cnf.clauses.append(bigAnd)
+                            for v in todo_new:
+                                self._cnf.clauses.append([ -second_lit, v ])
+                        elif node_type == OR or node_type == CON:
+                            bigOr = [ -second_lit ] + [ v for v in todo_new ]
+                            self._cnf.clauses.append(bigOr)
+                            for v in todo_new:
+                                self._cnf.clauses.append([ second_lit, -v ])
+                        elif node_type == GUESS:
+                            # remember in second_lit, whether one of the unfinished atoms is true
+                            bigOr = [ -second_lit ] + [ v for v in todo_new ]
+                            self._cnf.clauses.append(bigOr)
+                            for v in todo_new:
+                                self._cnf.clauses.append([ second_lit, -v ])
+                            # make sure that not more than one of the unfinished atoms is true
+                            for v in todo_new:
+                                for vp in todo_new:
+                                    if v < vp:
+                                        self._cnf.clauses.append([-v, -vp])
+
+                    unfinished[t][a] = set([first_lit, second_lit])
+
+            
+            # check which nodes are completely done and finalize them
+            new_unfinished = {}
+            for a in unfinished[t]:
+                if a in t.vertices: # if the variable is still there, we keep it
+                    new_unfinished[a] = unfinished[t][a]
+                else: # otherwise we finalize the node
+                    node_type = nodes[a][0]
+                    if node_type == AND:
+                        bigAnd = [ a ] + [ -v for v in unfinished[t][a] ]
+                        self._cnf.clauses.append(bigAnd)
+                        for v in unfinished[t][a]:
+                            self._cnf.clauses.append([ -a, v ])
+                    elif node_type == OR:
+                        bigOr = [ -a ] + [ v for v in unfinished[t][a] ]
+                        self._cnf.clauses.append(bigOr)
+                        for v in unfinished[t][a]:
+                            self._cnf.clauses.append([ a, -v ])
+                    elif node_type == CON:
+                        bigOr = [ v for v in unfinished[t][a] ]
+                        self._cnf.clauses.append(bigOr)
+                        self._cnf.clauses.append([-a])
+                    elif node_type == GUESS:
+                        # make sure that at least one of the unfinished atoms is true
+                        bigOr = [ v for v in unfinished[t][a] ]
+                        self._cnf.clauses.append(bigOr)
+                        # make sure that not more than one of the unfinished atoms is true
+                        for v in unfinished[t][a]:
+                            for vp in unfinished[t][a]:
+                                if v < vp:
+                                    self._cnf.clauses.append([-v, -vp])
+                        self._cnf.clauses.append([-a])
+
+            unfinished[t] = new_unfinished
+
+        # finalize the nodes that are left in the root
+        root = td.get_root()
+        for a in unfinished[root]:
+            node_type = nodes[a][0]
+            if node_type == AND:
+                bigAnd = [ a ] + [ -v for v in unfinished[root][a] ]
+                self._cnf.clauses.append(bigAnd)
+                for v in unfinished[root][a]:
+                    self._cnf.clauses.append([ -a, v ])
+            elif node_type == OR:
+                bigOr = [ -a ] + [ v for v in unfinished[root][a] ]
+                self._cnf.clauses.append(bigOr)
+                for v in unfinished[root][a]:
+                    self._cnf.clauses.append([ a, -v ])
+            elif node_type == CON:
+                bigOr = [ v for v in unfinished[root][a] ]
+                self._cnf.clauses.append(bigOr)
+                self._cnf.clauses.append([-a])
+            elif node_type == GUESS:
+                # make sure that at least one of the unfinished atoms is true
+                bigOr = [ v for v in unfinished[root][a] ]
+                self._cnf.clauses.append(bigOr)
+                # make sure that not more than one of the unfinished atoms is true
+                for v in unfinished[root][a]:
+                    for vp in unfinished[root][a]:
+                        if v < vp:
+                            self._cnf.clauses.append([-v, -vp])
+                self._cnf.clauses.append([-a])
+
+        self._cnf.nr_vars = self._max
+        self._finalize_cnf()
 
     def _finalize_cnf(self):
         pass
