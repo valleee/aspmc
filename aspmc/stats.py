@@ -355,8 +355,8 @@ def encoding_stats(cnf):
     input = CNF(cnf)
     primal = Hypergraph()
     primal.add_nodes_from(range(1, input.nr_vars + 1))
-    primal.add_edges_from([ set([ abs(x) for x in c ]) for c in input._clauses ])
-    td = treedecomposition.from_hypergraph(primal)
+    primal.add_edges_from([ set([ abs(x) for x in c ]) for c in input.clauses ])
+    td = treedecomposition.from_hypergraph(primal, timeout="10")
     logger.info(f"Tree decomposition #bags: {td.bags} tree_width: {td.width} #vertices: {td.vertices}")
     return 0
     
