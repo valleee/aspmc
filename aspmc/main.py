@@ -4,7 +4,6 @@
 Main module providing the application logic.
 """
 
-from operator import add
 import sys
 import logging
 import importlib
@@ -82,7 +81,7 @@ logger.setLevel(logging.INFO)
 
 help_string = """
 aspmc: An Algebraic Answer Set Counter
-aspmc version 1.0.2, Sep 28, 2022
+aspmc version 1.0.3, Oct 11, 2022
 
 python main.py [-m .] [-c] [-s .] [-n] [-t] [-ds .] [-dt .] [-k .] [-g .] [-b .] [-h] [<INPUT-FILES>]
     --mode              -m  MODE        set input mode to MODE:
