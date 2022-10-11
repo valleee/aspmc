@@ -4,6 +4,7 @@
 Program module providing the progam class with cycle breaking methods and clark completion(s).
 """
 
+from platform import node
 import networkx as nx
 import os
 import logging
@@ -1174,31 +1175,18 @@ class Program(object):
         for atom in self._guess:
             nodes[atom] = (INPUT, set())
 
-        seen = set()
-        facts = set([ r.head[0] for r in self._program if len(r.body) == 0 ])
-        for f in facts:
-            self._cnf.clauses.append([f])
-        seen.update(facts)
-        
-        remaining = [ r for r in self._program if len(r.head) == 0 or r.head[0] not in facts ]
-        for r in remaining:
+        for r in self._program:
             r.proven = self._new_var(f"{r}")
             if len(r.head) != 0:
                 nodes[r.proven] = (AND, set(r.body))
                 nodes[abs(r.head[0])][1].add(r.proven)
-                seen.add(r.head[0])
             else:
                 nodes[r.proven] = (CON, set([ -atom for atom in r.body ]))
-
-        # handle the atoms that do not occur in the head of any rule
-        falses = [ a for a in self._deriv if a not in seen and nodes[a][0] == OR and len(nodes[a][1]) == 0 ]
-        for f in falses:
-            self._cnf.clauses.append([-f])
 
         # set up the and/or graph
         graph = nx.Graph()
         graph.add_nodes_from(range(1, self._max + 1))
-        for r in remaining:
+        for r in self._program:
             if len(r.body) > 0:
                 for atom in r.head:
                     graph.add_edge(atom, r.proven)
@@ -1226,7 +1214,7 @@ class Program(object):
                 last[a] = idx
             t.idx = idx
             idx += 1
-        
+
         # remember per bag which nodes have which partial result
         unfinished = {}
         # handle the bags in dfs order
@@ -1293,7 +1281,7 @@ class Program(object):
                                             self._cnf.clauses.append([-v, -vp])
 
                         unfinished[t][atom] = set([first_lit, second_lit])
-                        
+
             # then take care of the current bag
             for a in t.vertices:
                 node_type, inputs = nodes[a]
@@ -1351,8 +1339,8 @@ class Program(object):
                                     self._cnf.clauses.append([-v, -vp])
                         self._cnf.clauses.append([-a])
                     inputs.clear()
-                elif any([ t.idx == last[b] for b in inputs ]):
-                    todo_new = [ b for b in inputs if abs(b) in t.vertices ]
+                elif any([ t.idx == last[abs(b)] for b in inputs ]):
+                    todo_new = set([ b for b in inputs if abs(b) in t.vertices ])
                     inputs.difference_update(todo_new)
                     if a not in unfinished[t]:
                         unfinished[t][a] = todo_new
@@ -1408,38 +1396,7 @@ class Program(object):
                                     for vp in todo_new:
                                         if v < vp:
                                             self._cnf.clauses.append([-v, -vp])
-
                         unfinished[t][a] = set([first_lit, second_lit])
-                        
-        # finalize the nodes that are left in the root
-        root = td.get_root()
-        for a in unfinished[root]:
-            print("what?")
-            node_type = nodes[a][0]
-            if node_type == AND:
-                bigAnd = [ a ] + [ -v for v in unfinished[root][a] ]
-                self._cnf.clauses.append(bigAnd)
-                for v in unfinished[root][a]:
-                    self._cnf.clauses.append([ -a, v ])
-            elif node_type == OR:
-                bigOr = [ -a ] + [ v for v in unfinished[root][a] ]
-                self._cnf.clauses.append(bigOr)
-                for v in unfinished[root][a]:
-                    self._cnf.clauses.append([ a, -v ])
-            elif node_type == CON:
-                bigOr = [ v for v in unfinished[root][a] ]
-                self._cnf.clauses.append(bigOr)
-                self._cnf.clauses.append([-a])
-            elif node_type == GUESS:
-                # make sure that at least one of the unfinished atoms is true
-                bigOr = [ v for v in unfinished[root][a] ]
-                self._cnf.clauses.append(bigOr)
-                # make sure that not more than one of the unfinished atoms is true
-                for v in unfinished[root][a]:
-                    for vp in unfinished[root][a]:
-                        if v < vp:
-                            self._cnf.clauses.append([-v, -vp])
-                self._cnf.clauses.append([-a])
 
         self._cnf.nr_vars = self._max
         self._finalize_cnf()

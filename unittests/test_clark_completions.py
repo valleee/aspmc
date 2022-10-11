@@ -18,11 +18,15 @@ def cb_none(program):
 
 def cb_ors(program):
     program.tpUnfold()
-    program.clark_completion()
+    program.td_guided_clark_completion()
 
 def cb_both(program):
     program.tpUnfold()
-    program.clark_completion()
+    program.td_guided_both_clark_completion()
+    
+def cb_adaptive(program):
+    program.tpUnfold()
+    program.td_guided_adaptive_clark_completion()
 
 class TestClarkCompletions(unittest.TestCase):
 
@@ -129,6 +133,42 @@ class TestClarkCompletions(unittest.TestCase):
         grounder.ground(control, program_files= ["./test/test_cycle2.lp"])
         program = Program(control)
         cb_both(program)
+        cnf = program.get_cnf()
+        results = cnf.evaluate()
+        self.assertEqual(results[0], 4)
+
+
+    def test_adaptive(self):
+        control = clingoext.Control()
+        grounder.ground(control, program_files= ["./test/test_2n.lp"])
+        program = Program(control)
+        cb_adaptive(program)
+        self.assertEqual(len(program.get_queries()), 0)
+        cnf = program.get_cnf()
+        results = cnf.evaluate()
+        self.assertEqual(results[0], 2**100)
+
+        control = clingoext.Control()
+        grounder.ground(control, program_files= ["./test/test_constraints.lp"])
+        program = Program(control)
+        cb_adaptive(program)
+        self.assertEqual(len(program.get_queries()), 0)
+        cnf = program.get_cnf()
+        results = cnf.evaluate()
+        self.assertEqual(results[0], 1)
+
+        control = clingoext.Control()
+        grounder.ground(control, program_files= ["./test/test_cycle.lp"])
+        program = Program(control)
+        cb_adaptive(program)
+        cnf = program.get_cnf()
+        results = cnf.evaluate()
+        self.assertEqual(results[0], 2)
+
+        control = clingoext.Control()
+        grounder.ground(control, program_files= ["./test/test_cycle2.lp"])
+        program = Program(control)
+        cb_adaptive(program)
         cnf = program.get_cnf()
         results = cnf.evaluate()
         self.assertEqual(results[0], 4)
