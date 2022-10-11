@@ -1227,22 +1227,6 @@ class Program(object):
             t.idx = idx
             idx += 1
         
-        # for r in self._program:
-        #     left = nodes[r.proven][1]
-        #     prev = 0
-        #     while len(left) > 0:
-        #         min_idx = min([ last[abs(b)] for b in left ])
-        #         take = [ b for b in left if first[abs(b)] <= min_idx ]
-        #         left = [ b for b in left if first[abs(b)] > min_idx ]
-        #         if prev != 0:
-        #             take.append(prev)
-        #         new_lit = self._new_var("")
-        #         bigAnd = [ new_lit ] + [ -v for v in take ]
-        #         self._cnf.clauses.append(bigAnd)                  
-        #         for v in take:
-        #             self._cnf.clauses.append([ -new_lit, v ])
-        #     rules[self._td.get_bag(td_idx[idx])].append(r)
-        
         # remember per bag which nodes have which partial result
         unfinished = {}
         # handle the bags in dfs order
@@ -1366,6 +1350,7 @@ class Program(object):
                                 if v < vp:
                                     self._cnf.clauses.append([-v, -vp])
                         self._cnf.clauses.append([-a])
+                    inputs.clear()
                 elif any([ t.idx == last[b] for b in inputs ]):
                     todo_new = [ b for b in inputs if abs(b) in t.vertices ]
                     inputs.difference_update(todo_new)
@@ -1425,7 +1410,7 @@ class Program(object):
                                             self._cnf.clauses.append([-v, -vp])
 
                         unfinished[t][a] = set([first_lit, second_lit])
-
+                        
         # finalize the nodes that are left in the root
         root = td.get_root()
         for a in unfinished[root]:
@@ -1471,7 +1456,7 @@ class Program(object):
         primal = Hypergraph()
         primal.add_nodes_from(range(1, self._max + 1))
         primal.add_edges_from([ set([ abs(x) for x in c ]) for c in self._cnf.clauses ])
-        td = treedecomposition.from_hypergraph(primal, timeout = "10")
+        td = treedecomposition.from_hypergraph(primal)
         logger.info(f"Tree Decomposition #bags: {td.bags} treewidth: {td.width} #vertices: {td.vertices}")      
 
     def get_cnf(self):
