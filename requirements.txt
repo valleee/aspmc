@@ -4,3 +4,4 @@ lark
 clingo
 matplotlib
 dataclasses
+sympy
