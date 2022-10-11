@@ -9,6 +9,7 @@ import subprocess
 import time
 import importlib
 import numpy as np
+import sys
 
 from aspmc.graph.hypergraph import Hypergraph
 
@@ -488,19 +489,26 @@ class CNF(object):
             knowledge_compiler (:obj:`string`, optional): The knowledge compiler to use. Defaults to `sharpsat-td`.
         Returns:
             None
-        """
+        """        
+        if logger.isEnabledFor(logging._nameToLevel["DEBUG"]):
+            logger.debug("Knowledge compiler output:")
+            out = sys.stdout.buffer
+        else:
+            out = subprocess.PIPE
         if knowledge_compiler == "c2d":
-            p = subprocess.Popen([os.path.join(src_path, "c2d/bin/c2d_linux"), "-smooth_all", "-reduce", "-in", file_name, "-dt_in", file_name + ".dtree"], stdout=subprocess.PIPE)
+            p = subprocess.Popen([os.path.join(src_path, "c2d/bin/c2d_linux"), "-smooth_all", "-reduce", "-in", file_name, "-dt_in", file_name + ".dtree", "-cache_size", "3500"], stdout=out)
         elif knowledge_compiler == "miniC2D":            
-            p = subprocess.Popen([os.path.join(src_path, "miniC2D/bin/linux/miniC2D"), "-c", file_name, "-v", file_name + ".vtree"], stdout=subprocess.PIPE)
+            p = subprocess.Popen([os.path.join(src_path, "miniC2D/bin/linux/miniC2D"), "-c", file_name, "-v", file_name + ".vtree", "-s" , "3500"], stdout=out)
         elif knowledge_compiler == "sharpsat-td":
             decot = float(config.config["decot"])
             decot = max(decot, 0.1)
-            p = subprocess.Popen(["./sharpSAT", "-dDNNF", "-decot", str(decot), "-decow", "100", "-tmpdir", "/tmp/", "-cs", "3500", file_name, "-dDNNF_out", file_name + ".nnf"], cwd=os.path.join(src_path, "sharpsat-td/bin/"), stdout=subprocess.PIPE)
+            p = subprocess.Popen(["./sharpSAT", "-dDNNF", "-decot", str(decot), "-decow", "100", "-tmpdir", "/tmp/", "-cs", "3500", file_name, "-dDNNF_out", file_name + ".nnf"], cwd=os.path.join(src_path, "sharpsat-td/bin/"), stdout=out)
         elif knowledge_compiler == "d4":
-            p = subprocess.Popen([os.path.join(src_path, "d4/d4_static"), file_name, "-dDNNF", f"-out={file_name}.nnf", "-smooth"], stdout=subprocess.PIPE)
+            p = subprocess.Popen([os.path.join(src_path, "d4/d4_static"), file_name, "-dDNNF", f"-out={file_name}.nnf", "-smooth"], stdout=out)
         p.wait()
-        p.stdout.close()
+        if not logger.isEnabledFor(logging._nameToLevel["DEBUG"]):
+            p.stdout.close()
+
         if p.returncode != 0:
             logger.error(f"Knowledge compilation failed with exit code {p.returncode}.")
             exit(-1) 
@@ -600,15 +608,21 @@ class CNF(object):
         Returns:
             None
         """
+        if logger.isEnabledFor(logging._nameToLevel["DEBUG"]):
+            logger.debug("Knowledge compiler output:")
+            out = sys.stdout.buffer
+        else:
+            out = subprocess.PIPE
         if knowledge_compiler == "c2d":
-            p = subprocess.Popen([os.path.join(src_path, "c2d/bin/c2d_linux"), "-cache_size", "3500", "-keep_trivial_cls", "-smooth_all", "-in", file_name, "-dt_in", file_name + ".dtree", "-force", file_name + ".force"], stdout=subprocess.PIPE)
+            p = subprocess.Popen([os.path.join(src_path, "c2d/bin/c2d_linux"), "-cache_size", "3500", "-keep_trivial_cls", "-smooth_all", "-in", file_name, "-dt_in", file_name + ".dtree", "-force", file_name + ".force"], stdout=out)
         elif knowledge_compiler == "miniC2D":
-            p = subprocess.Popen([os.path.join(src_path, "miniC2D/bin/linux/miniC2D"), "-c", file_name, "-v", file_name + ".vtree"], stdout=subprocess.PIPE)
+            p = subprocess.Popen([os.path.join(src_path, "miniC2D/bin/linux/miniC2D"), "-c", file_name, "-v", file_name + ".vtree", "-s" , "3500"], stdout=out)
         else:
             logger.error(f"Knowledge compiler {config.config['knowledge_compiler']} does not support X/D-constrained compilation")
             exit(-1)
         p.wait()
-        p.stdout.close()
+        if not logger.isEnabledFor(logging._nameToLevel["DEBUG"]):
+            p.stdout.close()
         if p.returncode != 0:
             logger.error(f"Knowledge compilation failed with exit code {p.exitcode}.")
             exit(-1) 
