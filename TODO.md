@@ -1,4 +1,3 @@
-- make the handling of facts and unseen atoms uniform in both-clark
 - in the semiring modules make it so that every idempotent semiring supports conversion to a maxsat problem itself
 - find out what causes the error in ./main.py -m problog -c test/test_smokers_10.lp -p -k miniC2D
 - integrate a better fvs solver
