@@ -26,7 +26,7 @@ def cb_both(program):
     
 def cb_adaptive(program):
     program.tpUnfold()
-    program.td_guided_adaptive_clark_completion()
+    program.td_guided_both_clark_completion(adaptive = True, latest = True)
 
 class TestClarkCompletions(unittest.TestCase):
 

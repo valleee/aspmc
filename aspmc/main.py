@@ -112,8 +112,8 @@ python main.py [-m .] [-c] [-s .] [-n] [-t] [-ds .] [-dt .] [-k .] [-g .] [-b .]
     --guide_clark       -g  GUIDE       set the tree decomposition type to use to guide the clark completion to GUIDE:
                                         * none              : preform the normal clark completion without guidance
                                         * ors               : guide for or nodes only 
-                                        * both              : guide for both `and` and `or` nodes 
-                                        * adaptive          : guide `both` that takes into account the cost of auxilliary variables (default)
+                                        * both              : guide for both `and` and `or` nodes (default)
+                                        * adaptive          : guide `both` that takes into account the cost of auxilliary variables 
     --cycle-breaking    -b  STRATEGY    set the cycle-breaking strategy to STRATEGY:
                                         * none              : do not perform cycle-breaking, not suitable for model counting
                                         * tp                : perform tp-unfolding, suitable for model counting (default)
@@ -143,7 +143,7 @@ def main():
     write_name = ""
     treewidth = False
     semiring_string = "aspmc.semirings.probabilistic"
-    guide = "adaptive"
+    guide = "both"
 
     # parse the arguments
     while len(sys.argv) > 1:
@@ -277,9 +277,9 @@ def main():
         elif guide == "ors":
             program.td_guided_clark_completion()
         elif guide == "both":
-            program.td_guided_both_clark_completion()
+            program.td_guided_both_clark_completion(adaptive=False, latest=False)
         elif guide == "adaptive":
-            program.td_guided_adaptive_clark_completion()
+            program.td_guided_both_clark_completion(adaptive=True, latest=True)
         logger.info("------------------------------------------------------------")
         if write_name:
             with open(f'{write_name}.cnf', mode='wb') as file_out:
