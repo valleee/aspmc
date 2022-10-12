@@ -113,6 +113,7 @@ python main.py [-m .] [-c] [-s .] [-n] [-t] [-ds .] [-dt .] [-k .] [-g .] [-b .]
                                         * ors               : guide for or nodes only 
                                         * both              : guide for both `and` and `or` nodes (default)
                                         * adaptive          : guide `both` that takes into account the cost of auxilliary variables 
+                                        * choose            : try to choose the best of the previous options bases on expected treewidth
     --cycle-breaking    -b  STRATEGY    set the cycle-breaking strategy to STRATEGY:
                                         * none              : do not perform cycle-breaking, not suitable for model counting
                                         * tp                : perform tp-unfolding, suitable for model counting (default)
@@ -204,7 +205,7 @@ def main():
                 del sys.argv[1:3]
             elif sys.argv[1] == "-g" or sys.argv[1] == "--guide_clark":
                 guide = sys.argv[2]
-                if sys.argv[2] != "none" and sys.argv[2] != "ors" and sys.argv[2] != "both" and sys.argv[2] != "adaptive":
+                if sys.argv[2] != "none" and sys.argv[2] != "ors" and sys.argv[2] != "both" and sys.argv[2] != "adaptive" and sys.argv[2] != "choose":
                     logger.error("  Unknown guide: " + sys.argv[2])
                     exit(-1)
                 del sys.argv[1:3]
@@ -279,6 +280,8 @@ def main():
             program.td_guided_both_clark_completion(adaptive=False, latest=False)
         elif guide == "adaptive":
             program.td_guided_both_clark_completion(adaptive=True, latest=True)
+        elif guide == "choose":
+            program.choose_clark_completion()
         logger.info("------------------------------------------------------------")
         if write_name:
             with open(f'{write_name}.cnf', mode='wb') as file_out:

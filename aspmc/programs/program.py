@@ -956,6 +956,7 @@ class Program(object):
             td.remove(set(range(self._max + 1, 2*self._max + 1)))
             td.vertices = self._max 
         logger.info(f"Tree Decomposition #bags: {td.bags} treewidth: {td.width} #vertices: {td.vertices}")
+
         
         if latest:
             # at which td node each variable occurs last
@@ -1282,6 +1283,174 @@ class Program(object):
 
         self._cnf.nr_vars = self._max
         self._finalize_cnf()
+
+    def choose_clark_completion(self):
+        # approximate final width when using both/adaptive strategy
+        OR = 0
+        AND = 1
+        CON = 2
+        GUESS = 3
+        INPUT = 4
+        # approximate final width when using none strategy
+        nodes = { a : (OR, set()) for a in self._deriv }
+
+        cur_max = self._max
+        for a in self._exactlyOneOf:
+            cur_max += 1
+            nodes[cur_max] = (GUESS, set(a))
+
+        for atom in self._guess:
+            nodes[atom] = (INPUT, set())
+
+        for r in self._program:
+            cur_max += 1
+            nodes[cur_max] = (AND, set(r.body))
+            if len(r.head) != 0:
+                nodes[abs(r.head[0])][1].add(cur_max)
+
+        # set up the and/or graph
+        graph = nx.Graph()
+        for a, inputs in nodes.items():
+            graph.add_edges_from([ (a, v) for v in inputs[1] ])
+            graph.add_edges_from([ (a + cur_max, v) for v in inputs[1] ])
+            
+        td = treedecomposition.from_graph(graph, solver = config.config["decos"], timeout = str(float(config.config["decot"])/3))
+        cost_both = 0
+        for t in td.bag_iter():
+            for tp in t.children:
+                tp.parent = t
+
+        for t in td.bag_iter():
+            cur_cost = len(t.vertices)
+            if t != td.get_root():
+                kept = t.vertices.intersection(t.parent.vertices)
+            else:
+                kept = set()
+            occ_counter = { a : 0 for a in t.vertices }
+            for a in kept: 
+                occ_counter[a] += 1
+            for tp in t.children:
+                for a in tp.vertices.intersection(t.vertices):
+                    occ_counter[a] += 1
+            for a, c in occ_counter.items():
+                if c >= 3 and a > cur_max and nodes[a - cur_max][0] != INPUT:
+                    cur_cost += 1
+            if cur_cost > cost_both:
+                cost_both = cur_cost
+
+        # set up the and/or graph
+        graph = nx.Graph()
+        for a, inputs in nodes.items():
+            graph.add_edges_from(sum([ [ (v, vp) for v in inputs[1] if v != vp ] for vp in inputs[1] ], []))
+            graph.add_edges_from([ (a, v) for v in inputs[1] ])
+            
+        td = treedecomposition.from_graph(graph, solver = config.config["decos"], timeout = str(float(config.config["decot"])/3))
+        cost_none = td.width
+
+        # approximate final width when using or strategy
+        # set up the and/or graph
+        graph = nx.Graph()
+        for a, inputs in nodes.items():
+            if inputs[0] == AND or inputs[0] == GUESS:
+                graph.add_edges_from(sum([ [ (v, vp) for v in inputs[1] if v != vp ] for vp in inputs[1] ], []))
+            graph.add_edges_from([ (a, v) for v in inputs[1] ])
+            if inputs[0] != AND and inputs[0] != GUESS:
+                graph.add_edges_from([ (a + cur_max, v) for v in inputs[1] ])
+            
+        td = treedecomposition.from_graph(graph, solver = config.config["decos"], timeout = str(float(config.config["decot"])/3))
+        cost_or = 0
+        for t in td.bag_iter():
+            for tp in t.children:
+                tp.parent = t
+
+        for t in td.bag_iter():
+            cur_cost = len(t.vertices)
+            if t != td.get_root():
+                kept = t.vertices.intersection(t.parent.vertices)
+            else:
+                kept = set()
+            occ_counter = { a : 0 for a in t.vertices }
+            for a in kept: 
+                occ_counter[a] += 1
+            for tp in t.children:
+                for a in tp.vertices.intersection(t.vertices):
+                    occ_counter[a] += 1
+            for a, c in occ_counter.items():
+                if c >= 3 and a > cur_max and nodes[a - cur_max][0] != INPUT and nodes[a - cur_max][0] != AND and nodes[a - cur_max][0] != GUESS:
+                    cur_cost += 1
+            if cur_cost > cost_or:
+                cost_or = cur_cost
+
+        logger.debug(f"Approximate expected treewidth using strategy none: {cost_none}")
+        logger.debug(f"Approximate expected treewidth using strategy or: {cost_or}")
+        logger.debug(f"Approximate expected treewidth using strategy both/adaptive: {cost_both}")
+
+        if cost_none <= min(cost_both, cost_or) + 1:
+            logger.info(f"Choosing Unguided Clark Completion")
+            self.clark_completion()
+        elif cost_or <= cost_both + 1:
+            logger.info(f"Choosing OR-guided Clark Completion")
+            self.td_guided_clark_completion()
+        else:
+            logger.info(f"Choosing completely guided Clark Completion")
+            self.td_guided_both_clark_completion(adaptive=True, latest = True)
+    
+    def build_bdds(self):
+        from dd.cudd import BDD
+        bdd = BDD()
+        bdd.declare(*[ self._internal_name(v) for v in self._guess ])
+        # set up the and/or graph
+        graph = nx.DiGraph()
+        for r in self._program:
+            if len(r.body) > 0:
+                for atom in r.head:
+                    graph.add_edge(r, atom)
+                for atom in r.body:
+                    graph.add_edge(abs(atom), r)
+        vertex_to_bdd = { v : bdd.var(self._internal_name(v)) for v in self._guess }
+        ts = nx.topological_sort(graph)
+        for cur in ts:
+            if isinstance(cur, Rule):
+                new_bdd = vertex_to_bdd[cur.body[0]]
+                for b in cur.body[1:]:
+                    new_bdd = new_bdd & vertex_to_bdd[b]
+                vertex_to_bdd[cur] = new_bdd
+            elif cur not in self._guess:
+                ins = list(graph.in_edges(nbunch=cur))
+                new_bdd = vertex_to_bdd[ins[0][0]]
+                for r in ins[1:]:
+                    new_bdd = new_bdd | vertex_to_bdd[r[0]]
+                vertex_to_bdd[cur] = new_bdd
+        return vertex_to_bdd
+
+    def build_sdds(self):
+        from pysdd.sdd import SddManager, Vtree
+        vtree = Vtree(var_count=len(self._guess), var_order=list(range(1,len(self._guess) + 1)), vtree_type="balanced")
+        sdd = SddManager.from_vtree(vtree)
+        vars = list(sdd.vars)
+        # set up the and/or graph
+        graph = nx.DiGraph()
+        for r in self._program:
+            if len(r.body) > 0:
+                for atom in r.head:
+                    graph.add_edge(r, atom)
+                for atom in r.body:
+                    graph.add_edge(abs(atom), r)
+        vertex_to_sdd = { v : vars[i] for i,v in enumerate(self._guess) }
+        ts = nx.topological_sort(graph)
+        for cur in ts:
+            if isinstance(cur, Rule):
+                new_bdd = vertex_to_sdd[cur.body[0]]
+                for b in cur.body[1:]:
+                    new_bdd = new_bdd & vertex_to_sdd[b]
+                vertex_to_sdd[cur] = new_bdd
+            elif cur not in self._guess:
+                ins = list(graph.in_edges(nbunch=cur))
+                new_bdd = vertex_to_sdd[ins[0][0]]
+                for r in ins[1:]:
+                    new_bdd = new_bdd | vertex_to_sdd[r[0]]
+                vertex_to_sdd[cur] = new_bdd
+        return vertex_to_sdd
 
     def _finalize_cnf(self):
         pass
