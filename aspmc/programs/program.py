@@ -1285,6 +1285,21 @@ class Program(object):
         self._finalize_cnf()
 
     def choose_clark_completion(self):
+        """Applies the clark completion to the program. 
+
+        Does not check whether the program is tight! 
+        Chooses which of the clark completions to use based on an
+        approximate check for the expected treewidth of the resulting CNF.
+        
+        Does not return anything only constructs the cnf.
+        The CNF can be obtained by using `get_cnf()`.
+
+        The solver to compute the tree decomposition and its timeout can be specified in 
+        aspmc.config.
+
+        Returns:
+            None
+        """
         # approximate final width when using both/adaptive strategy
         OR = 0
         AND = 1
