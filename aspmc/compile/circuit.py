@@ -1,3 +1,4 @@
+from operator import index
 import queue
 import numpy as np
 import copy
@@ -337,11 +338,15 @@ class Circuit(object):
                 else:
                     if line[0] == 'A':
                         vtree_node = lca[vtree_nodes[int(line[2])]][vtree_nodes[int(line[3])]]
-                        val = np.full(shape, one, dtype=dtype)
-                        for x in line[2:]:
-                            val *= mem[int(x)]
+                        left = index_to_node[vtree_node-1].left.idx
+                        right = index_to_node[vtree_node-1].right.idx
+                        if lca[right][vtree_nodes[int(line[2])]] != right:
+                            right, left = left, right
+                        val = mem[int(line[2])]*factor(right, vtree_nodes[int(line[2])])*mem[int(line[3])]*factor(left, vtree_nodes[int(line[3])])
                     elif line[0] == 'O':
-                        vtree_node = lca[vtree_nodes[int(line[3])]][vtree_nodes[int(line[4])]]           
+                        vtree_node = lca[vtree_nodes[int(line[3])]][vtree_nodes[int(line[4])]]  
+                        for x in line[3:]:
+                            vtree_node = lca[vtree_node][vtree_nodes[int(x)]]         
                         val = np.full(shape, zero, dtype=dtype)
                         for x in line[3:]:
                             val += mem[int(x)]*factor(vtree_node, vtree_nodes[int(x)])
