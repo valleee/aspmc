@@ -1,6 +1,5 @@
 - in td_guided_clark_completion make sure that we do not have clauses that are too long
 - in the semiring modules make it so that every idempotent semiring supports conversion to a maxsat problem itself
-- find out what causes the error in ./main.py -m problog -c test/test_smokers_10.lp -p -k miniC2D
 - integrate a better fvs solver
 - handle evidence for problog programs
 - set probabilistics facts with probabilities 0/1 to false/true.
