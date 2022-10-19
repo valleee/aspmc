@@ -22,6 +22,8 @@ from aspmc.compile.circuit import Circuit
 import aspmc.compile.dtree as dtree
 import aspmc.compile.vtree as vtree
 
+import aspmc.signal_handling as my_signals
+
 import aspmc.config as config
 
 src_path = os.path.abspath(os.path.realpath(inspect.getfile(inspect.currentframe())))
@@ -234,7 +236,9 @@ class CNF(object):
             list: The list of variables that are defined by the inputs `P` w.r.t. the cnf.
         """
         (cnf_fd, cnf_tmp) = tempfile.mkstemp()
+        my_signals.tempfiles.add(cnf_tmp)
         (input_fd, input_tmp) = tempfile.mkstemp()
+        my_signals.tempfiles.add(input_tmp)
         with os.fdopen(cnf_fd, 'wb') as cnf_file:
             self.to_stream(cnf_file)
         with os.fdopen(input_fd, 'w') as input_file:
@@ -245,7 +249,9 @@ class CNF(object):
         ret = [ int(v) for v in ret ]
         p.stdout.close()
         os.remove(cnf_tmp)
+        my_signals.tempfiles.remove(cnf_tmp)
         os.remove(input_tmp)
+        my_signals.tempfiles.remove(input_tmp)
         return ret
         
     def is_sat(self):
@@ -490,7 +496,8 @@ class CNF(object):
         Returns:
             None
         """        
-        if False:#logger.isEnabledFor(logging._nameToLevel["DEBUG"]):
+        my_signals.tempfiles.add(file_name + '.nnf')
+        if logger.isEnabledFor(logging._nameToLevel["DEBUG"]):
             logger.debug("Knowledge compiler output:")
             out = sys.stdout.buffer
         else:
@@ -506,7 +513,7 @@ class CNF(object):
         elif knowledge_compiler == "d4":
             p = subprocess.Popen([os.path.join(src_path, "d4/d4_static"), file_name, "-dDNNF", f"-out={file_name}.nnf", "-smooth"], stdout=out)
         p.wait()
-        if True: #not logger.isEnabledFor(logging._nameToLevel["DEBUG"]):
+        if not logger.isEnabledFor(logging._nameToLevel["DEBUG"]):
             p.stdout.close()
 
         if p.returncode != 0:
@@ -525,6 +532,7 @@ class CNF(object):
         """
         start = time.time()
         cnf_fd, cnf_tmp = tempfile.mkstemp()
+        my_signals.tempfiles.add(cnf_tmp)
         # sharpsat-td-live is a special case since it does not fall into the `first compile then evaluate category`
         if config.config["knowledge_compiler"] == "sharpsat-td-live":
             with os.fdopen(cnf_fd, 'wb') as cnf_file:
@@ -537,6 +545,7 @@ class CNF(object):
             end = time.time()
             logger.info(f"Counting & Compilation time:  {end - start}")
             os.remove(cnf_tmp)
+            my_signals.tempfiles.remove(cnf_tmp)
             return results
         
         # prepare everything for the compilation
@@ -546,6 +555,7 @@ class CNF(object):
                 self.to_stream(cnf_file)
             d3 = dtree.TD_dtree(self, solver = config.config["decos"], timeout = config.config["decot"])
             d3.write(cnf_tmp + '.dtree')
+            my_signals.tempfiles.add(cnf_tmp + '.dtree')
             end = time.time()
             logger.info(f"Dtree time:               {end - start}")
         elif config.config["knowledge_compiler"] == "miniC2D":            
@@ -553,6 +563,7 @@ class CNF(object):
                 self.to_stream(cnf_file)
             v3 = vtree.TD_vtree(self, solver = config.config["decos"], timeout = config.config["decot"])
             v3.write(cnf_tmp + ".vtree")
+            my_signals.tempfiles.add(cnf_tmp + '.vtree')
             end = time.time()
             logger.info(f"Vtree time:               {end - start}")
         elif config.config["knowledge_compiler"] == "sharpsat-td":
@@ -577,11 +588,15 @@ class CNF(object):
         
         # remove the temporary files
         os.remove(cnf_tmp)
+        my_signals.tempfiles.remove(cnf_tmp)
         os.remove(cnf_tmp+".nnf")
+        my_signals.tempfiles.remove(cnf_tmp + '.nnf')
         if config.config["knowledge_compiler"] == "c2d":
             os.remove(cnf_tmp + ".dtree")
+            my_signals.tempfiles.remove(cnf_tmp + '.dtree')
         elif config.config["knowledge_compiler"] == "miniC2D":
             os.remove(cnf_tmp + ".vtree")
+            my_signals.tempfiles.remove(cnf_tmp + '.vtree')
         return results
 
 
@@ -608,6 +623,7 @@ class CNF(object):
         Returns:
             None
         """
+        my_signals.tempfiles.add(file_name + '.nnf')
         if logger.isEnabledFor(logging._nameToLevel["DEBUG"]):
             logger.debug("Knowledge compiler output:")
             out = sys.stdout.buffer
@@ -639,11 +655,14 @@ class CNF(object):
         """
         start = time.time()
         cnf_fd, cnf_tmp = tempfile.mkstemp()
+        my_signals.tempfiles.add(cnf_tmp)
         if config.config["knowledge_compiler"] == "c2d":
             (force_vars, d3) = concom.tree_from_cnf(self, tree_type = dtree.Dtree)
             d3.write(cnf_tmp + ".dtree")
+            my_signals.tempfiles.add(cnf_tmp + '.dtree')
             with os.fdopen(cnf_fd, 'wb') as cnf_file:
                 self.to_stream(cnf_file)
+            my_signals.tempfiles.add(cnf_tmp + '.force')
             with open(cnf_tmp + ".force", 'w') as force_out:
                 force_out.write(f"{len(force_vars)} {' '.join([ str(v) for v in force_vars ])}")
             end = time.time()
@@ -653,6 +672,7 @@ class CNF(object):
                 self.to_stream(cnf_file)
             (_, v3) = concom.tree_from_cnf(self, tree_type=vtree.Vtree)
             v3.write(cnf_tmp + ".vtree")
+            my_signals.tempfiles.add(cnf_tmp + '.vtree')
             end = time.time()
             logger.info(f"Vtree time:               {end - start}")
         else:
@@ -681,12 +701,17 @@ class CNF(object):
         logger.info(f"Counting time:            {end - start}")
         # clean up the files
         os.remove(cnf_tmp)
+        my_signals.tempfiles.remove(cnf_tmp)
         os.remove(cnf_tmp+".nnf")
+        my_signals.tempfiles.remove(cnf_tmp + '.nnf')
         if config.config["knowledge_compiler"] == "c2d":
             os.remove(cnf_tmp + ".dtree")
+            my_signals.tempfiles.remove(cnf_tmp + '.dtree')
             os.remove(cnf_tmp + ".force")
+            my_signals.tempfiles.remove(cnf_tmp + '.force')
         else:
             os.remove(cnf_tmp + ".vtree")
+            my_signals.tempfiles.remove(cnf_tmp + '.vtree')
         return results
 
     def preprocessing(self):
@@ -697,7 +722,8 @@ class CNF(object):
             mode = "general"
         
         (cnf_file_fd, cnf_file_tmp) = tempfile.mkstemp()
-        
+        my_signals.tempfiles.add(cnf_file_tmp)
+
         with os.fdopen(cnf_file_fd, mode = 'w') as cnf_file:
             cnf_file.write(str(self)) 
         
@@ -716,6 +742,8 @@ class CNF(object):
                     line = [int(l) for l in line]
                     self.clauses.append(line[:-1])
         end = time.time()
+        os.remove(cnf_file_tmp)
+        my_signals.tempfiles.remove(cnf_file_tmp)
         logger.info(f"Preprocessing time:       {end - start}")
 
     def evaluate(self, strategy = "flexible", preprocessing = False):
@@ -778,6 +806,7 @@ class CNF(object):
 
     def solve_maxsat(self):
         cnf_fd, cnf_tmp = tempfile.mkstemp()
+        my_signals.tempfiles.add(cnf_tmp)
         logger.debug(f"    MaxSAT CNF file: {cnf_tmp}")
         # first we check whether this is actually a MaxSAT instance or whether it is just a SAT instance in disguise
         import math
@@ -805,6 +834,7 @@ class CNF(object):
             with os.fdopen(cnf_fd, mode='wb') as cnf_out:
                 # create result file
                 res_fd, res_tmp = tempfile.mkstemp()
+                my_signals.tempfiles.add(res_tmp)
                 # write the cnf with the additional negated unit literals
                 cnf_out.write(f"p cnf {self.nr_vars} {len(self.clauses) + len(negated_units)}\n".encode())
                 for c in self.clauses:
@@ -834,6 +864,7 @@ class CNF(object):
                             weight *= weights[to_pos(lit)]
                         p.stdout.close()
                 os.remove(res_tmp)
+                my_signals.tempfiles.remove(res_tmp)
         else:
             logger.info("   Stats MaxSAT")
             logger.info("------------------------------------------------------------")
@@ -871,6 +902,7 @@ class CNF(object):
             logger.info(f"Solving time:         {time.time() - start}")
             logger.info("------------------------------------------------------------")
         os.remove(cnf_tmp)
+        my_signals.tempfiles.add(cnf_tmp)
         return weight
 
         

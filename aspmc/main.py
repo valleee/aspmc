@@ -23,6 +23,7 @@ from aspmc.compile.cnf import CNF
 
 import aspmc.config as config
 
+import aspmc.signal_handling
 
 logger = logging.getLogger("aspmc")
 logging.basicConfig(format='[%(levelname)s] %(name)s: %(message)s', level="INFO")

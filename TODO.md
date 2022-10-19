@@ -4,7 +4,6 @@
 - handle evidence for problog programs
 - set probabilistics facts with probabilities 0/1 to false/true.
 - use magic set transformation idea to reduce the size of the ground program
-- remove temp files even when interrupted
 - raise errors instead of doing exit(-1)
 Maybe:
 - handle queries in asp mode
