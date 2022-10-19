@@ -172,12 +172,12 @@ def TD_to_dtree(cnf, td, done = None):
         dtree_idx[bag.idx] = cur_dtree
     return dtree_idx[td.get_root().idx]
 
-def TD_dtree(cnf, solver = "htd", timeout = "0.5"):
+def TD_dtree(cnf, solver = "flow-cutter", timeout = "0.5"):
     """Constructs a dtree for a cnf by generating a tree decomposition and calling `TD_to_dtree` with it.
 
     Args:
         cnf (:obj:`aspmc.compile.cnf.CNF`): The cnf to construct the dtree for.
-        solver (:obj:`string`, optional): Which solver to use to generate the tree decomposition. Defaults to "htd".
+        solver (:obj:`string`, optional): Which solver to use to generate the tree decomposition. Defaults to "flow-cutter".
         timeout (:obj:`string`, optional): The timeout in second to give to the solver. Defaults to "0.5".
         
     Returns:

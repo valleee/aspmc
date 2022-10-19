@@ -708,7 +708,6 @@ class Program(object):
             atoms.update(tuple(map(abs, r.body)))
             self._graph.add_edge(atoms)
         self._td = treedecomposition.from_hypergraph(self._graph, solver = solver, timeout = timeout)
-        logger.info(f"Tree Decomposition #bags: {self._td.bags} treewidth: {self._td.width} #vertices: {self._td.vertices}")
 
     def clark_completion(self):
         """Applies the clark completion to the program. 
@@ -778,7 +777,7 @@ class Program(object):
         """
         self._cnf = CNF()
         self._decomposeGraph(solver = config.config["decos"], timeout = config.config["decot"])
-
+        logger.info(f"Tree Decomposition #bags: {self._td.bags} unfolded treewidth: {self._td.width} #vertices: {self._td.vertices}")
         # at which td node to handle each rule
         rules = {}
         # at which td node each variable occurs last
@@ -955,7 +954,7 @@ class Program(object):
         if adaptive:
             td.remove(set(range(self._max + 1, 2*self._max + 1)))
             td.vertices = self._max 
-        logger.info(f"Tree Decomposition #bags: {td.bags} treewidth: {td.width} #vertices: {td.vertices}")
+        logger.info(f"Tree Decomposition #bags: {td.bags} unfolded treewidth: {td.width} #vertices: {td.vertices}")
 
         
         if latest:
@@ -1399,15 +1398,19 @@ class Program(object):
         logger.debug(f"Approximate expected treewidth using strategy none: {cost_none}")
         logger.debug(f"Approximate expected treewidth using strategy or: {cost_or}")
         logger.debug(f"Approximate expected treewidth using strategy both/adaptive: {cost_both}")
+        logger.info("------------------------------------------------------------")
 
         if cost_none <= min(cost_both, cost_or) + 1:
             logger.info(f"Choosing Unguided Clark Completion")
+            logger.info("------------------------------------------------------------")
             self.clark_completion()
         elif cost_or <= cost_both + 1:
             logger.info(f"Choosing OR-guided Clark Completion")
+            logger.info("------------------------------------------------------------")
             self.td_guided_clark_completion()
         else:
             logger.info(f"Choosing completely guided Clark Completion")
+            logger.info("------------------------------------------------------------")
             self.td_guided_both_clark_completion(adaptive=True, latest = True)
     
     def build_bdds(self):
@@ -1480,7 +1483,7 @@ class Program(object):
         primal.add_nodes_from(range(1, self._max + 1))
         primal.add_edges_from([ set([ abs(x) for x in c ]) for c in self._cnf.clauses ])
         td = treedecomposition.from_hypergraph(primal)
-        logger.info(f"Tree Decomposition #bags: {td.bags} treewidth: {td.width} #vertices: {td.vertices}")      
+        logger.info(f"Tree Decomposition #bags: {td.bags} CNF treewidth: {td.width} #vertices: {td.vertices}")      
 
     def get_cnf(self):
         """Used to get the extended cnf corresponding to the program. 

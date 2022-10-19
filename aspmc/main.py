@@ -81,7 +81,7 @@ logger.setLevel(logging.INFO)
 
 help_string = """
 aspmc: An Algebraic Answer Set Counter
-aspmc version 1.0.3, Oct 11, 2022
+aspmc version 1.0.4, Oct 19, 2022
 
 python main.py [-m .] [-c] [-s .] [-n] [-t] [-ds .] [-dt .] [-k .] [-g .] [-b .] [-h] [<INPUT-FILES>]
     --mode              -m  MODE        set input mode to MODE:
@@ -249,6 +249,7 @@ def main():
         logger.info("   Stats Original")
         logger.info("------------------------------------------------------------")
         program._decomposeGraph()
+        logger.info(f"Tree Decomposition #bags: {program._td.bags} initial treewidth: {program._td.width} #vertices: {program._td.vertices}")
         logger.info("------------------------------------------------------------")
         if no_pp and write_name:
             with open(f'{write_name}.lp', mode='wb') as file_out:

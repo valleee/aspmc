@@ -490,7 +490,7 @@ class CNF(object):
         Returns:
             None
         """        
-        if logger.isEnabledFor(logging._nameToLevel["DEBUG"]):
+        if False:#logger.isEnabledFor(logging._nameToLevel["DEBUG"]):
             logger.debug("Knowledge compiler output:")
             out = sys.stdout.buffer
         else:
@@ -506,7 +506,7 @@ class CNF(object):
         elif knowledge_compiler == "d4":
             p = subprocess.Popen([os.path.join(src_path, "d4/d4_static"), file_name, "-dDNNF", f"-out={file_name}.nnf", "-smooth"], stdout=out)
         p.wait()
-        if not logger.isEnabledFor(logging._nameToLevel["DEBUG"]):
+        if True: #not logger.isEnabledFor(logging._nameToLevel["DEBUG"]):
             p.stdout.close()
 
         if p.returncode != 0:
@@ -734,6 +734,7 @@ class CNF(object):
         Returns:
             object: The value of the AMC instance.
         """
+        logger.debug(f"Evaluating CNF with {self.nr_vars} variables and {len(self.clauses)} clauses.")
         if strategy == "flexible":
             if len(self.semirings) == 1 and self.semirings[0].is_idempotent():
                 return self.solve_maxsat()
