@@ -1,3 +1,4 @@
+- also read CNFs from stdin
 - in td_guided_clark_completion make sure that we do not have clauses that are too long
 - in the semiring modules make it so that every idempotent semiring supports conversion to a maxsat problem itself
 - integrate a better fvs solver

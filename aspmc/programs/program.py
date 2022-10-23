@@ -55,6 +55,14 @@ class Rule(object):
         self.head = head
         self.body = body
 
+    def __hash__(self):
+        return hash((tuple(self.head), tuple(self.body)))
+
+    def __eq__(self, other):
+        if not isinstance(other, type(self)): 
+            return NotImplemented
+        return self.head == other.head and self.body == other.body
+
     def __repr__(self):
         return "; ".join([str(a) for a in self.head]) + ":- " + ", ".join([ ("not " if b < 0 else "") + str(abs(b)) for b in self.body]) 
 
