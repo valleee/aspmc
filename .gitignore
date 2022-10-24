@@ -16,3 +16,4 @@ output.pstats
 .vscode/*
 dist/*
 aspmc.egg-info/*
+build/*
