@@ -285,11 +285,10 @@ def main():
         elif guide == "choose":
             program.choose_clark_completion()
         logger.info("------------------------------------------------------------")
-        if write_name:
-            with open(f'{write_name}.cnf', mode='wb') as file_out:
-                program.write_dimacs(file_out)
 
         cnf = program.get_cnf()
+        if write_name:
+            cnf.to_file(f'{write_name}.cnf', extras = True)
         if treewidth:
             logger.info("   Stats CNF")
             logger.info("------------------------------------------------------------")

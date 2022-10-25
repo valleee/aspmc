@@ -578,7 +578,6 @@ class CNF(object):
         CNF.compile_single(cnf_tmp, knowledge_compiler = config.config["knowledge_compiler"])
         end = time.time()
         logger.info(f"Compilation time:         {end - start}")
-        
         # perform the counting on the circuit
         weights, zero, one, dtype = self.get_weights()
         start = time.time()
