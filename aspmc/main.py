@@ -20,6 +20,7 @@ from aspmc.programs.optprogram import OptProgram
 
 from aspmc.compile.cnf import CNF
 
+from aspmc.graph.treedecomposition import from_hypergraph
 
 import aspmc.config as config
 
@@ -241,7 +242,10 @@ def main():
     elif mode == "optasp":
         program = OptProgram(program_str, program_files)
     elif mode == "cnf":
-        cnf = CNF(program_files[0])
+        if len(program_files) > 0:
+            cnf = CNF(path = program_files[0])
+        else:
+            cnf = CNF(string = program_str)
     else:
         program = Program(program_str = program_str, program_files = program_files)
 
@@ -289,12 +293,12 @@ def main():
         cnf = program.get_cnf()
         if write_name:
             cnf.to_file(f'{write_name}.cnf', extras = True)
-        if treewidth:
-            logger.info("   Stats CNF")
-            logger.info("------------------------------------------------------------")
-            program.encoding_stats()
-            logger.info("------------------------------------------------------------")
-
+    if treewidth:
+        logger.info("   Stats CNF")
+        logger.info("------------------------------------------------------------")
+        td = from_hypergraph(cnf.primal_hypergraph(), timeout = "-1")
+        logger.info(f"Tree Decomposition #bags: {td.bags} CNF treewidth: {td.width} #vertices: {td.vertices}")      
+        logger.info("------------------------------------------------------------")
     if not count:
         exit(0)
 

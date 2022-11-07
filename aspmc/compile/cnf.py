@@ -80,7 +80,8 @@ class CNF(object):
             `semirings[i-1].from_value(x)` to obtain a value in semirings[i-1].
 
     """
-    def __init__(self, path = None):
+    def __init__(self, path = None, string = None):
+        assert(path is None or string is None)
         self.clauses = []
         self.nr_vars = 0
         self.weights = {}
@@ -112,6 +113,31 @@ class CNF(object):
                     else:
                         line = [int(l) for l in line]
                         self.clauses.append(line[:-1])
+                        
+        if string is not None:
+            for line in string.split("\n"):
+                line = line.split()
+                if len(line) == 0:
+                    continue
+                if line[0] == 'c':
+                    if len(line) > 2 and line[1] == 'p':
+                        if line[2] == "weight":
+                            self.weights[int(line[3])] = ' '.join(line[4:-1])
+                        elif line[2] == "semirings":
+                            self.semirings = [ importlib.import_module(mod) for mod in line[3:-1] ]
+                        elif line[2] == "transform":
+                            self.transform = ' '.join(line[3:-1])
+                        elif line[2] == "quantify":
+                            self.quantified.append([int(x) for x in line[3:-1]])
+                        else:
+                            logger.error(f"Unknown property {line[2]}!")
+                        if line[-1] != '0':
+                            logger.error("Property line not ended with 0!")
+                elif line[0] == 'p':
+                    self.nr_vars = int(line[2])
+                else:
+                    line = [int(l) for l in line]
+                    self.clauses.append(line[:-1])
 
         # check whether the input is reasonable
         if len(self.quantified) != len(self.semirings):
