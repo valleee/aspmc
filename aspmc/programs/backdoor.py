@@ -50,12 +50,12 @@ class ClingoControl:
                 # might get "fake" duplicates :(, with different model.optimality_proven
                 if answer_set not in aset[2][-1:]:
                     aset[2].append(answer_set)
+        if encodingFile != None:
+            with open(encodingFile,"r") as encoding:
+                encodingContent = "".join(encoding.readlines())
 
-        with open(encodingFile,"r") as encoding:
-            encodingContent = "".join(encoding.readlines())
-
-        # FIXME: use mutable string
-        self.prog += encodingContent
+            # FIXME: use mutable string
+            self.prog += encodingContent
         
         c = clingo.Control()
         if usc:

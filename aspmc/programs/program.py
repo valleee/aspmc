@@ -24,6 +24,8 @@ from aspmc.parsing.clingoparser.clingoext import Control
 import aspmc.programs.backdoor as backdoor
 import aspmc.programs.grounder as grounder
 
+import subprocess
+
 import inspect 
 
 src_path = os.path.abspath(os.path.realpath(inspect.getfile(inspect.currentframe())))
@@ -332,11 +334,23 @@ class Program(object):
                 res += f"edge({vp},{v}).\n"
         return res
 
-    def _compute_backdoor(self, idx):
+    def _compute_backdoor_clingo(self, idx, timeout = 30.0):
         comp = self._condensation.nodes[idx]["members"]
-        start = time.time()
-        import subprocess
-        q = subprocess.Popen([os.path.join(src_path, "fvs/src/build/FeedbackVertexSet")], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        program_str = "\n".join(f"{{abs({v})}}." for v in comp) + "\n"
+        program_str += ":~ abs(X). [1,X]\n"
+        program_str += "ok(X) :- abs(X).\n"
+        for v in comp:
+            ancs = list(set([vp[0] for vp in self.dep.in_edges(nbunch=v) if vp[0] in comp] + [vp[0] for vp in self.dep.out_edges(nbunch=v) if vp[0] in comp]))
+            for i in range(len(ancs)):
+                program_str += f"ok({v}) :- {','.join(f'ok({vp})' for vp in ancs[:i] + ancs[i+1:])}.\n"
+        program_str += "\n".join(f":- not ok({v})." for v in comp) + "\n"
+        program_str += "#show abs/1."
+        c = backdoor.ClingoControl(program_str)
+        res = c.get_backdoor(None, timeout = timeout)[2][0]
+        return res
+
+    def _compute_backdoor_fvs(self, idx, timeout = 30.0, approximate = False):
+        comp = self._condensation.nodes[idx]["members"]
         edges = {}
         for v in comp:
             ancs = set([vp[0] for vp in self.dep.in_edges(nbunch=v) if vp[0] in comp])
@@ -353,16 +367,26 @@ class Program(object):
         for v in edges.keys():
             for vp in edges[v]:
                 graph += f"{v} {vp}\n"
-        try:
+        if not approximate:
+            q = subprocess.Popen([os.path.join(src_path, "fvs/src/build/FeedbackVertexSet")], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
             output, err = q.communicate(input=graph.encode(), timeout = float(config.config["backdoort"]))
-        except subprocess.TimeoutExpired:
-            logger.warning(f"Optimal backdoor computation failed, switching to approximation.")
+        else:
             q = subprocess.Popen([os.path.join(src_path, "fvs/src/build/FeedbackVertexSet"), "Appx"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
             output, err = q.communicate(input=graph.encode())
         res = [ int(v) for v in output.decode().split()[1:] ]
-        logger.debug("backdoor comp: " + str(len(comp)))
-        logger.debug("backdoor res: " + str(len(res)))
-        logger.debug(f"backdoor time: {time.time() - start}")
+        return res
+
+    def _compute_backdoor(self, idx):
+        start = time.time()
+        comp = self._condensation.nodes[idx]["members"]
+        try:
+            if config.config["backdoors"] == "fvs":
+                res = self._compute_backdoor_fvs(idx, timeout = float(config.config["backdoort"]), approximate = False)
+            elif config.config["backdoors"] == "clingo":
+                res = self._compute_backdoor_clingo(idx, timeout = float(config.config["backdoort"]))
+        except (subprocess.TimeoutExpired,IndexError):
+            logger.warning(f"Optimal backdoor computation failed, switching to approximation.")
+            res = self._compute_backdoor_fvs(idx, timeout = float(config.config["backdoort"]), approximate = True)
         if False:
             import matplotlib.pyplot as plt
             from networkx.drawing.nx_pydot import graphviz_layout
@@ -375,6 +399,9 @@ class Program(object):
             plt.tight_layout()
             plt.axis("off")
             plt.show()
+        logger.debug("backdoor comp: " + str(len(comp)))
+        logger.debug("backdoor res: " + str(len(res)))
+        logger.debug(f"backdoor time: {time.time() - start}")
         return res
 
     def _backdoor_process(self, comp, backdoor):

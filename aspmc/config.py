@@ -4,5 +4,6 @@ config = {
     "knowledge_compiler" : "sharpsat-td", 
     "constrained" : "XD",
     "backdoort" : "30",
+    "backdoors" : "fvs",
     "number_cores" : "1"
 }
