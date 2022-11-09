@@ -366,7 +366,7 @@ class Program(object):
         if False:
             import matplotlib.pyplot as plt
             from networkx.drawing.nx_pydot import graphviz_layout
-            labels = { node : "out" if node in res else "in" for node in comp }
+            labels = { node : self._external_name(node) for node in comp }
             local_dep = self.dep.subgraph(comp)
             pos = graphviz_layout(local_dep, prog="neato")
             values = [ 1.0 if node in res else 0.0 for node in local_dep.nodes()]

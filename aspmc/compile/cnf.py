@@ -741,7 +741,7 @@ class CNF(object):
 
     def preprocessing(self):
         start = time.time()
-        if len(self.semirings) == 1 and  self.semirings[0].is_idempotent(): # TODO make sure is_idempotent() is always implemented
+        if len(self.semirings) == 1 and self.semirings[0].is_idempotent(): # TODO make sure is_idempotent() is always implemented
             mode = "idemp"
         else:
             mode = "general"
