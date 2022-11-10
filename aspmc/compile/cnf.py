@@ -787,7 +787,6 @@ class CNF(object):
         Returns:
             object: The value of the AMC instance.
         """
-        logger.debug(f"Evaluating CNF with {self.nr_vars} variables and {len(self.clauses)} clauses.")
         if strategy == "flexible":
             if len(self.semirings) == 1 and self.semirings[0].is_idempotent():
                 return self.solve_maxsat()

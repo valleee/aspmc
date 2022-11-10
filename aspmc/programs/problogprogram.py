@@ -271,6 +271,29 @@ class ProblogProgram(Program):
             result += f"query({query}).\n"
         return result
 
+    def to_lpmln(self):
+        import math
+        result = ""
+        for v in self._guess:
+            result += f"{{{self._external_name(v)}}}.\n"
+        for r in self._program:
+            result += ";".join([self._external_name(v) for v in r.head])
+            if len(r.body) > 0:
+                result += ":-"
+                result += ",".join([("not " if v < 0 else "") + self._external_name(abs(v)) for v in r.body])
+            result += ".\n"
+        for query in self.queries:
+            result += f"query({query}) :- {query}.\n"
+        for v in self._guess:
+            if self.weights[self._internal_name(v)] <= 0.0:
+                result += f":- {self._external_name(v)}.\n"
+            elif self.weights[self._internal_name(v)] >= 1.0:
+                result += f":- not {self._external_name(v)}.\n"
+            else:
+                result += f"{math.log(self.weights[self._internal_name(v)])}:- not {self._external_name(v)}.\n"
+                result += f"{math.log(1.0 - self.weights[self._internal_name(v)])}:- {self._external_name(v)}.\n"
+        return result
+
     def _finalize_cnf(self):
         weight_list = self.get_weights()
         for v in range(self._max*2):

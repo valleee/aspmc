@@ -298,6 +298,7 @@ def main():
         logger.info("------------------------------------------------------------")
         td = from_hypergraph(cnf.primal_hypergraph(), timeout = "-1")
         logger.info(f"Tree Decomposition #bags: {td.bags} CNF treewidth: {td.width} #vertices: {td.vertices}")      
+        logger.debug(f"Evaluating CNF with {cnf.nr_vars} variables and {len(cnf.clauses)} clauses.")
         logger.info("------------------------------------------------------------")
     if not count:
         exit(0)
