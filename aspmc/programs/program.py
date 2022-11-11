@@ -1517,9 +1517,9 @@ class Program(object):
         my_vtree.write("test.vtree")
         from pysdd.sdd import SddManager, Vtree
         vtree = Vtree(filename="test.vtree")
+        #vtree = Vtree(var_count=len(self._guess), var_order=list(range(1,len(self._guess) + 1)), vtree_type="balanced")
         sdd = SddManager.from_vtree(vtree)
         vars = list(sdd.vars)
-        print(vars)
         # set up the and/or graph
         graph = nx.DiGraph()
         for r in self._program:
