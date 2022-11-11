@@ -1346,14 +1346,14 @@ class Program(object):
         cur_max = self._max
         for a in self._exactlyOneOf:
             cur_max += 1
-            nodes[cur_max] = (GUESS, set(a))
+            nodes[cur_max] = (GUESS, set(abs(v) for v in a))
 
         for atom in self._guess:
             nodes[atom] = (INPUT, set())
 
         for r in self._program:
             cur_max += 1
-            nodes[cur_max] = (AND, set(r.body))
+            nodes[cur_max] = (AND, set(abs(v) for v in r.body))
             if len(r.head) != 0:
                 nodes[abs(r.head[0])][1].add(cur_max)
 
@@ -1477,10 +1477,49 @@ class Program(object):
         return vertex_to_bdd
 
     def build_sdds(self):
+        from aspmc.compile.vtree import TD_to_vtree
+        # approximate final width when using both/adaptive strategy
+        OR = 0
+        AND = 1
+        GUESS = 3
+        INPUT = 4
+        # approximate final width when using none strategy
+        nodes = { a : (OR, set()) for a in self._deriv }
+
+        cur_max = self._max
+        for a in self._exactlyOneOf:
+            cur_max += 1
+            nodes[cur_max] = (GUESS, set(abs(v) for v in a))
+
+        for atom in self._guess:
+            nodes[atom] = (INPUT, set())
+
+        for r in self._program:
+            cur_max += 1
+            nodes[cur_max] = (AND, set(abs(v) for v in r.body))
+            if len(r.head) != 0:
+                nodes[abs(r.head[0])][1].add(cur_max)
+
+        # set up the and/or graph
+        graph = nx.Graph()
+        for a, inputs in nodes.items():
+            graph.add_edges_from([ (a, v) for v in inputs[1] ])
+            
+        td = treedecomposition.from_graph(graph, solver = config.config["decos"], timeout = str(float(config.config["decot"])))
+        td.remove(set(range(1, cur_max + 1)).difference(self._guess))
+        my_vtree = TD_to_vtree(td)
+        guesses = list(self._guess)
+        rev_mapping = { guesses[i] : i + 1 for i in range(len(self._guess)) }
+        for node in my_vtree:
+            if node.val != None:
+                assert(node.val in self._guess)
+                node.val = rev_mapping[node.val]
+        my_vtree.write("test.vtree")
         from pysdd.sdd import SddManager, Vtree
-        vtree = Vtree(var_count=len(self._guess), var_order=list(range(1,len(self._guess) + 1)), vtree_type="balanced")
+        vtree = Vtree(filename="test.vtree")
         sdd = SddManager.from_vtree(vtree)
         vars = list(sdd.vars)
+        print(vars)
         # set up the and/or graph
         graph = nx.DiGraph()
         for r in self._program:
@@ -1489,12 +1528,16 @@ class Program(object):
                     graph.add_edge(r, atom)
                 for atom in r.body:
                     graph.add_edge(abs(atom), r)
-        vertex_to_sdd = { v : vars[i] for i,v in enumerate(self._guess) }
+        vertex_to_sdd = { v : vars[i] for i,v in enumerate(guesses) }
         ts = nx.topological_sort(graph)
         for cur in ts:
             if isinstance(cur, Rule):
+                if cur.body[0] < 0:
+                    vertex_to_sdd[cur.body[0]] = ~vertex_to_sdd[-cur.body[0]]
                 new_bdd = vertex_to_sdd[cur.body[0]]
                 for b in cur.body[1:]:
+                    if b < 0:
+                        vertex_to_sdd[b] = ~vertex_to_sdd[-b]
                     new_bdd = new_bdd & vertex_to_sdd[b]
                 vertex_to_sdd[cur] = new_bdd
             elif cur not in self._guess:

@@ -2,8 +2,6 @@
 Vtree module providing methods to construct, visualize and generally work with vtrees.
 """
 
-import queue
-
 import aspmc.graph.treedecomposition as treedecomposition
 from aspmc.graph.bintree import bintree
 
@@ -63,39 +61,49 @@ def TD_to_vtree(td):
     Returns:
         :obj:`Vtree`: The (partial) vtree corresponding to the tree decomposition.
     """
-    gone = set()
-    root = Vtree()
-    q = queue.LifoQueue()
-    q.put((root, td.get_root()))
-    count = 0
-    while not q.empty():
-        count += 1
-        parent, cur_n = q.get()
-        removed = set(cur_n.vertices).difference(gone)
-        if len(cur_n.children) == 1:
-            removed = removed.difference(set(cur_n.children[0].vertices))
-        gone.update(removed)
-        removed = list(removed)
-        if len(removed) > 0:
-            for v in removed[:-1]:
-                parent.left = Vtree(val = v)
-                parent.right = Vtree()
-                parent = parent.right
-            if len(cur_n.children) > 0:
-                parent.left = Vtree(val = removed[-1])
-                parent.right = Vtree()
-                parent = parent.right
+    # at which td node each variable occurs last
+    last = {}
+    # at which td node to handle which variables
+    variables = { bag : [] for bag in td.bag_iter()}
+    idx = 0
+    td_idx = list(td.bag_iter())
+    for t in td.bag_iter():
+        for a in t.vertices:
+            last[a] = idx
+        t.idx = idx
+        idx += 1
+    
+    for a, i in last.items():
+        variables[td_idx[i]].append(a)
+    
+
+    vtree_idx = [ None for _ in range(td.bags) ]
+    for bag in td.bag_iter():
+        cur_vtree = None        
+        # take care of the dtrees for the children
+        for child in bag.children:
+            child_vtree = vtree_idx[child.idx]
+            if cur_vtree == None:
+                cur_vtree = child_vtree
             else:
-                parent.val = removed[-1]
-            
-        if len(cur_n.children) > 0:
-            for child in cur_n.children[:-1]:
-                parent.left = Vtree()
-                q.put((parent.left, child))
-                parent.right = Vtree()
-                parent = parent.right
-            q.put((parent, cur_n.children[-1]))
-    return root
+                if child_vtree != None:
+                    new_vtree = Vtree()
+                    new_vtree.right = cur_vtree
+                    new_vtree.left = child_vtree
+                    cur_vtree = new_vtree
+
+        # take care of the clauses that are here
+        for i in variables[bag]:
+            if cur_vtree == None:
+                cur_vtree = Vtree(val = i)
+            else:
+                new_vtree = Vtree()
+                new_vtree.right = cur_vtree
+                new_vtree.left = Vtree(val = i)
+                cur_vtree = new_vtree
+
+        vtree_idx[bag.idx] = cur_vtree
+    return vtree_idx[td.get_root().idx]
 
 def TD_vtree(cnf, solver = "htd", timeout = "0.5"):
     """Constructs a vtree for a cnf by generating a tree decomposition and calling `TD_to_vtree` with it.
