@@ -790,6 +790,9 @@ class CNF(object):
         if strategy == "flexible":
             if len(self.semirings) == 1 and self.semirings[0].is_idempotent():
                 return self.solve_maxsat()
+            elif len(self.semirings) == 1 and config.config["knowledge_compiler"] == "sharpsat-td"\
+                 and self.semirings[0].__name__ == "aspmc.semirings.probabilistic":
+                return self.solve_wmc()
             else:
                 return self.solve_compilation(preprocessing = preprocessing)
         elif strategy == "compilation":
@@ -929,4 +932,30 @@ class CNF(object):
         my_signals.tempfiles.add(cnf_tmp)
         return weight
 
+
+    def solve_wmc(self):
+        _, cnf_tmp = tempfile.mkstemp()
+        my_signals.tempfiles.add(cnf_tmp)
+        logger.debug(f"    WCNF file: {cnf_tmp}")
+        self.to_file(cnf_tmp, extras=True)
+        logger.info("   Stats Model Counter")
+        logger.info("------------------------------------------------------------")
+        start = time.time()
+        decot = float(config.config["decot"])
+        decot = max(decot, 0.1)
+        p = subprocess.Popen(["./sharpSAT", "-MWD", str(len(self.weights[1])), "-decot", str(decot), "-decow", "100", "-tmpdir", "/tmp/", "-cs", "3500", cnf_tmp], cwd=os.path.join(src_path, "sharpsat-td/bin/"), stdout=subprocess.PIPE)
+        p.wait()
+        for line in p.stdout.readlines():
+            line = line.decode()
+            if line.startswith("c s exact arb float "):
+                line = line[len("c s exact arb float "):]
+                result = np.array([ float(v) for v in line.split(";") ])
+        p.stdout.close()
+        if result is None:
+            raise SolvingError("Model Counter did not print a solution!")
         
+        logger.info(f"Counting time:         {time.time() - start}")
+        logger.info("------------------------------------------------------------")
+        os.remove(cnf_tmp)
+        my_signals.tempfiles.add(cnf_tmp)
+        return result

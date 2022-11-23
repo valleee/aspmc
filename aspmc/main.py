@@ -87,7 +87,7 @@ aspmc version 1.0.5, Nov 9, 2022
 
 python main.py [-m .] [-c] [-s .] [-n] [-t] [-ds .] [-dt .] [-k .] [-g .] [-b .] [-h] [<INPUT-FILES>]
     --mode              -m  MODE        set input mode to MODE:
-                                        * asp               : take a normal answer set program as input
+                                        * asp               : take a normal answer set program as input (default)
                                         * optasp            : take a normal answer set program with weak constraints as input
                                         * cnf               : take an (extended) cnf as input
                                         * problog           : take a problog program as input
@@ -95,6 +95,9 @@ python main.py [-m .] [-c] [-s .] [-n] [-t] [-ds .] [-dt .] [-k .] [-g .] [-b .]
                                         * meuproblog        : take a problog program with extra decision and utility atoms as input
                                         * mapproblog        : take a problog program with extra evidence and map query atoms as input
                                         * mpeproblog        : take a problog program with extra evidence atoms as input
+    --strategy          -st STRATEGY    set solving strategy to STRATEGY:
+                                        * flexible          : choose the solve flexibly (default)
+                                        * compilation       : use knowledge compilation
     --count             -c              not only output the equivalent cnf as out.cnf but also performs (algebraic) counting of the answer sets
     --semiring          -s  SEMIRING    use the semiring specified in the python file aspmc/semirings/SEMIRING.py
                                         only useful with -m problog
@@ -146,6 +149,7 @@ def main():
     treewidth = False
     semiring_string = "aspmc.semirings.probabilistic"
     guide = "both"
+    strategy = "flexible"
 
     # parse the arguments
     while len(sys.argv) > 1:
@@ -155,6 +159,12 @@ def main():
                 if mode != "problog" and mode != "asp" and mode != "smproblog" and mode != "meuproblog" \
                     and mode != "mapproblog" and mode != "mpeproblog" and mode != "optasp" and mode != "cnf":
                     logger.error("  Unknown mode: " + mode)
+                    exit(-1)
+                del sys.argv[1:3]
+            elif sys.argv[1] == "-st" or sys.argv[1] == "--strategy":
+                strategy = sys.argv[2]
+                if strategy != "flexible" and strategy != "compilation":
+                    logger.error("  Unknown strategy: " + strategy)
                     exit(-1)
                 del sys.argv[1:3]
             elif sys.argv[1] == "-b" or sys.argv[1] == "--cycle-breaking":
@@ -309,7 +319,7 @@ def main():
     #     assignment = ", ".join([ program._external_name(v) for v in program._guess if v in solution ])
     #     logger.result(f"The overall weight of the program is {weight}")# with {assignment}")
     #     return
-    results = cnf.evaluate(strategy = "flexible", preprocessing = preprocessing)
+    results = cnf.evaluate(strategy = strategy, preprocessing = preprocessing)
 
     # print the results
     logger.info("   Results")
