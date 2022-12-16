@@ -149,7 +149,7 @@ def main():
     treewidth = False
     semiring_string = "aspmc.semirings.probabilistic"
     guide = "both"
-    strategy = "flexible"
+    strategy = "compilation"
 
     # parse the arguments
     while len(sys.argv) > 1:
