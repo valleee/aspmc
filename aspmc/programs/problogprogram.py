@@ -202,7 +202,7 @@ class ProblogProgram(Program):
                     for rule in rules:
                         for prev_rule in rule[1]:
                             # for prev we do not need the other body atoms
-                            prev_rule.body = [ a for a in prev_rule.body if symbol_map[a].startswith(INTERNAL_ALGEBRAIC)] 
+                            prev_rule.body = [ a for a in prev_rule.body if a > 0 and symbol_map[a].startswith(INTERNAL_ALGEBRAIC)] 
                             new_objects.append(prev_rule)
                         rule[0].body = [] # make the guess unconditional
                         new_objects.append(rule[0])
@@ -221,7 +221,7 @@ class ProblogProgram(Program):
                                 exit(-1)
                         else:
                             weight /= rest
-                        self.weights[head_name] = weight
+                        self.weights[head_name] = max(min(weight, 1.0), 0.0) 
                         rest = tmp
                 else: # handle single atom guesses
                     if len(rules) == 0:

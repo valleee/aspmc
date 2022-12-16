@@ -5,20 +5,17 @@ if ! python3 -c 'import sys; assert sys.version_info >= (3,6)' > /dev/null;
 then 
     echo -e "${RED}python 3.6 or higher is required!${NC}";
 else
-    pkgs='libboost-all-dev libc6:i386 build-essential zlib1g-dev libmpfr-dev cmake'
+    pkgs='libboost-all-dev libc6:i386 build-essential zlib1g-dev libmpfr-dev libgmp-dev cmake'
     install=false
     for pkg in $pkgs; do
         status="$(dpkg-query -W --showformat='${db:Status-Status}' "$pkg" 2>&1)"
         if [ ! $? = 0 ] || [ ! "$status" = installed ]; then
-             install=true
              echo -e "${RED} Missing package $pkg. ${NC}" 
+	     echo -e "${GREEN} Installing missing packages. ${NC}"
+             sudo apt install $pkg
         break
         fi
     done
-    if "$install"; then
-        echo -e "${GREEN} Installing missing packages. ${NC}"
-        sudo apt install $pkgs
-    fi
     echo -e "${GREEN} Installing python modules. ${NC}"
     pip install -r requirements.txt > /dev/null
     echo -e "${GREEN} Downloading git submodules. ${NC}"

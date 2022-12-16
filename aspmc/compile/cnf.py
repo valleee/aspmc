@@ -752,7 +752,7 @@ class CNF(object):
         with os.fdopen(cnf_file_fd, mode = 'w') as cnf_file:
             cnf_file.write(str(self)) 
         
-        q = subprocess.Popen([os.path.join(src_path, "preprocessor/bin/sharpSAT"), "-m", mode, "-t", "FPVEGV", cnf_file_tmp], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        q = subprocess.Popen([os.path.join(src_path, "preprocessor/bin/sharpSAT"), "-m", mode, "-t", "FPVEG", cnf_file_tmp], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         output, err = q.communicate()
         
         self.clauses = [] 

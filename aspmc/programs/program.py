@@ -118,7 +118,6 @@ class Program(object):
     def _normalize(self, clingo_control):
         program = self._remove_tautologies(clingo_control)
         _atomToVertex = {} # the tree decomposition solver wants succinct numbering of vertices / no holes
-        _vertexToAtom = {} # inverse mapping of _atomToVertex 
 
         symbol_map = {}
         for sym in clingo_control.symbolic_atoms:
@@ -132,18 +131,18 @@ class Program(object):
                 # if we have the falsum rule we want to replace it with two rules
                 if not o.atoms:
                     a = self._new_var("unsat")
-                    _atomToVertex[a] = a
-                    _vertexToAtom[a] = a
-                    o.atoms.add(a)
-                    o.head = [a]
-                    o.body = [-a]
+                    orig_max = max( v for v in symbol_map.keys() ) + 1
+                    _atomToVertex[orig_max] = a
+                    o.atoms.add(orig_max)
+                    o.head = [orig_max]
+                    o.body = [-orig_max]
+                    o.choice = False
                 self._program.append(o)
                 for a in o.atoms.difference(_atomToVertex):	# add mapping for atom not yet mapped
                     if a in symbol_map:
                         _atomToVertex[a] = self._new_var(symbol_map[a])
                     else:
                         _atomToVertex[a] = self._new_var(f"projected_away({a})")
-                    _vertexToAtom[self._max] = a
 
         trans_prog = set()
         self._deriv = set(range(1,self._max + 1))
@@ -1547,6 +1546,50 @@ class Program(object):
                     new_bdd = new_bdd | vertex_to_sdd[r[0]]
                 vertex_to_sdd[cur] = new_bdd
         return vertex_to_sdd
+
+    def to_aig(self, path):
+        varMap = { name : var for var, name in self._nameMap.items() }
+        inputs = "\n".join( str(2*(i+1)) for i,v in enumerate(self._guess) )
+        nr_ands = 0
+        cur_idx = len(self._guess)
+        and_aig = ""
+        graph = nx.DiGraph()
+        for r in self._program:
+            if len(r.body) > 0:
+                for atom in r.head:
+                    graph.add_edge(r, atom)
+                for atom in r.body:
+                    graph.add_edge(abs(atom), r)
+        ts = nx.topological_sort(graph)
+        vertex_to_var = { v : 2*(i+1) for i,v in enumerate(self._guess) }
+        for cur in ts:
+            if isinstance(cur, Rule):
+                if cur.body[0] < 0:
+                    vertex_to_var[cur.body[0]] = vertex_to_var[-cur.body[0]] ^ 1
+                new_bdd = vertex_to_var[cur.body[0]]
+                for b in cur.body[1:]:
+                    if b < 0:
+                        vertex_to_var[b] = vertex_to_var[-b] ^ 1
+                    nr_ands += 1
+                    cur_idx += 1
+                    and_aig += f"{2*cur_idx} {new_bdd} {vertex_to_var[b]}\n"
+                    new_bdd = 2*cur_idx
+                vertex_to_var[cur] = new_bdd
+            elif cur not in self._guess:
+                ins = list(graph.in_edges(nbunch=cur))
+                new_bdd = vertex_to_var[ins[0][0]] ^ 1
+                for r in ins[1:]:
+                    nr_ands += 1
+                    cur_idx += 1
+                    and_aig += f"{2*cur_idx} {new_bdd} {vertex_to_var[r[0]] ^ 1}\n"
+                    new_bdd = 2*cur_idx
+                vertex_to_var[cur] = new_bdd ^ 1
+        outputs = "\n".join( str(vertex_to_var[varMap[name]]) for name in self.get_queries() )
+        with open(path, "w") as out_file:
+            out_file.write(f"aag {cur_idx} {len(self._guess)} 0 {len(self.get_queries())} {nr_ands}\n")
+            out_file.write(f"{inputs}\n")
+            out_file.write(f"{outputs}\n")
+            out_file.write(f"{and_aig}")
 
     def _finalize_cnf(self):
         pass
