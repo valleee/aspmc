@@ -1,4 +1,3 @@
-- add psutil as requirement
 - enable (weighted) model counting directly for all solvers, not only sharpsat-td, when possible
 - in td_guided_clark_completion make sure that we do not have clauses that are too long
 - in the semiring modules make it so that every idempotent semiring supports conversion to a maxsat problem itself
