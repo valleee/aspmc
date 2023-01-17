@@ -142,6 +142,8 @@ class ProblogProgram(Program):
         # remember for each atom which rules can derive it
         # if there is only one such rule and it is a guess, then we want to transfer the guess to the atom
         per_head = {}
+        # remember the true atoms so we can check verify that it makes sense that there are no conditional rules that derive an atom
+        trues = set()
         for sym in clingo_control.symbolic_atoms:
             symbol_map[sym.literal] = str(sym.symbol)
         for o in clingo_control.ground_program.objects:
@@ -194,9 +196,15 @@ class ProblogProgram(Program):
                         per_head[o.head[0]] = []
                     per_head[o.head[0]].append(o)
 
+                if len(o.head) == 1 and len(o.body) == 0 and not o.choice:
+                    trues.add(o.head[0])
+
         for idx in range(len(self.annotated_disjunctions)):
             for variables in self.annotated_disjunctions[idx]:
                 rules = self.annotated_disjunctions[idx][variables]
+                if len(rules) == 0:
+                    logger.error("There must be at least one probabilistic atom in an annotated disjuntion.")
+                    exit(-1)
                 if len(rules) > 1: # handle proper annotated disjunctions
                     rest = self.semiring.one()
                     for rule in rules:
@@ -206,7 +214,17 @@ class ProblogProgram(Program):
                             new_objects.append(prev_rule)
                         rule[0].body = [] # make the guess unconditional
                         new_objects.append(rule[0])
-                        new_objects.append(conditioned[rule[0].head[0]])
+                        if not rule[0].head[0] in conditioned:
+                            found = False
+                            for true_atom in trues:
+                                true_atom_name = symbol_map[true_atom]
+                                if f",{true_atom_name}," in symbol_map[rule[0].head[0]]:
+                                    found = True
+                                    break
+                            assert(found)
+                            # if the atom was proven to be true during grounding there will be no conditioned rule
+                        else:
+                            new_objects.append(conditioned[rule[0].head[0]])
                         # find out the weight
                         head_name = symbol_map[rule[0].head[0]]
                         start = len(head_name) - 3
@@ -224,11 +242,15 @@ class ProblogProgram(Program):
                         self.weights[head_name] = max(min(weight, 1.0), 0.0) 
                         rest = tmp
                 else: # handle single atom guesses
-                    if len(rules) == 0:
-                        logger.error("There must be at least one probabilistic atom in an annotated disjuntion.")
-                        exit(-1)
                     rule = rules[0]
                     if not rule[0].head[0] in conditioned:
+                        found = False
+                        for true_atom in trues:
+                            true_atom_name = symbol_map[true_atom]
+                            if f",{true_atom_name}," in symbol_map[rule[0].head[0]]:
+                                found = True
+                                break
+                        assert(found)
                         # if the atom was proven to be true during grounding there will be no conditioned rule
                         actual_name = symbol_map[rule[0].head[0]]
                         rule[0].body = [] # make the guess unconditional
