@@ -1477,7 +1477,9 @@ class Program(object):
 
     def build_sdds(self):
         from aspmc.compile.vtree import TD_to_vtree
-        # approximate final width when using both/adaptive strategy
+        from pysdd.sdd import Vtree, SddManager
+        import tempfile
+        # first generate a vtree for the program that is probably good
         OR = 0
         AND = 1
         GUESS = 3
@@ -1506,6 +1508,7 @@ class Program(object):
             
         td = treedecomposition.from_graph(graph, solver = config.config["decos"], timeout = str(float(config.config["decot"])))
         td.remove(set(range(1, cur_max + 1)).difference(self._guess))
+        td.get_root().vertices.update(self._guess)
         my_vtree = TD_to_vtree(td)
         guesses = list(self._guess)
         rev_mapping = { guesses[i] : i + 1 for i in range(len(self._guess)) }
@@ -1513,38 +1516,40 @@ class Program(object):
             if node.val != None:
                 assert(node.val in self._guess)
                 node.val = rev_mapping[node.val]
-        my_vtree.write("test.vtree")
-        from pysdd.sdd import SddManager, Vtree
-        vtree = Vtree(filename="test.vtree")
-        #vtree = Vtree(var_count=len(self._guess), var_order=list(range(1,len(self._guess) + 1)), vtree_type="balanced")
+
+        (_, vtree_tmp) = tempfile.mkstemp()
+        my_vtree.write(vtree_tmp)
+        vtree = Vtree(filename=vtree_tmp)
         sdd = SddManager.from_vtree(vtree)
         vars = list(sdd.vars)
+        os.remove(vtree_tmp)
+        vertex_to_sdd = { v : vars[i] for i,v in enumerate(guesses) }
+
         # set up the and/or graph
         graph = nx.DiGraph()
         for r in self._program:
-            if len(r.body) > 0:
-                for atom in r.head:
-                    graph.add_edge(r, atom)
-                for atom in r.body:
-                    graph.add_edge(abs(atom), r)
-        vertex_to_sdd = { v : vars[i] for i,v in enumerate(guesses) }
+            for atom in r.head:
+                graph.add_edge(r, atom)
+            for atom in r.body:
+                graph.add_edge(abs(atom), r)
+
+        # build the relevant sdds by traversing the graph in topological order
         ts = nx.topological_sort(graph)
         for cur in ts:
             if isinstance(cur, Rule):
-                if cur.body[0] < 0:
-                    vertex_to_sdd[cur.body[0]] = ~vertex_to_sdd[-cur.body[0]]
-                new_bdd = vertex_to_sdd[cur.body[0]]
-                for b in cur.body[1:]:
+                new_sdd = sdd.true()
+                for b in cur.body:
                     if b < 0:
                         vertex_to_sdd[b] = ~vertex_to_sdd[-b]
-                    new_bdd = new_bdd & vertex_to_sdd[b]
-                vertex_to_sdd[cur] = new_bdd
+                    new_sdd = new_sdd & vertex_to_sdd[b]
+                vertex_to_sdd[cur] = new_sdd
             elif cur not in self._guess:
                 ins = list(graph.in_edges(nbunch=cur))
-                new_bdd = vertex_to_sdd[ins[0][0]]
-                for r in ins[1:]:
-                    new_bdd = new_bdd | vertex_to_sdd[r[0]]
-                vertex_to_sdd[cur] = new_bdd
+                new_sdd = sdd.false()
+                for r in ins:
+                    new_sdd = new_sdd | vertex_to_sdd[r[0]]
+                vertex_to_sdd[cur] = new_sdd
+
         return vertex_to_sdd
 
     def to_aig(self, path):
