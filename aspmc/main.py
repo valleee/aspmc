@@ -83,7 +83,7 @@ logger.setLevel(logging.INFO)
 
 help_string = """
 aspmc: An Algebraic Answer Set Counter
-aspmc version 1.0.5, Nov 9, 2022
+aspmc version 1.0.6, Jan 20, 2023
 
 python main.py [-m .] [-c] [-s .] [-n] [-t] [-ds .] [-dt .] [-k .] [-g .] [-b .] [-h] [<INPUT-FILES>]
     --mode              -m  MODE        set input mode to MODE:
@@ -96,8 +96,8 @@ python main.py [-m .] [-c] [-s .] [-n] [-t] [-ds .] [-dt .] [-k .] [-g .] [-b .]
                                         * mapproblog        : take a problog program with extra evidence and map query atoms as input
                                         * mpeproblog        : take a problog program with extra evidence atoms as input
     --strategy          -st STRATEGY    set solving strategy to STRATEGY:
-                                        * flexible          : choose the solve flexibly (default)
-                                        * compilation       : use knowledge compilation
+                                        * flexible          : choose the solver flexibly 
+                                        * compilation       : use knowledge compilation (default)
     --count             -c              not only output the equivalent cnf as out.cnf but also performs (algebraic) counting of the answer sets
     --semiring          -s  SEMIRING    use the semiring specified in the python file aspmc/semirings/SEMIRING.py
                                         only useful with -m problog
