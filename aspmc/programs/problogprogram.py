@@ -312,6 +312,10 @@ class ProblogProgram(Program):
             elif self.weights[self._internal_name(v)] >= 1.0:
                 result += f":- not {self._external_name(v)}.\n"
             else:
+                if abs(math.log(self.weights[self._internal_name(v)])) < 0.1**10:
+                    result += f":- {self._external_name(v)}.\n"
+                elif abs(math.log(1.0 - self.weights[self._internal_name(v)])) < 0.1**10:
+                    result += f":- not {self._external_name(v)}.\n"
                 result += f"{math.log(self.weights[self._internal_name(v)])}:- not {self._external_name(v)}.\n"
                 result += f"{math.log(1.0 - self.weights[self._internal_name(v)])}:- {self._external_name(v)}.\n"
         return result

@@ -523,24 +523,23 @@ class CNF(object):
             None
         """        
         my_signals.tempfiles.add(file_name + '.nnf')
-        if logger.isEnabledFor(logging._nameToLevel["DEBUG"]):
-            logger.debug("Knowledge compiler output:")
-            out = sys.stdout.buffer
-        else:
-            out = subprocess.PIPE
+        logger.debug("Knowledge compiler output:")
         if knowledge_compiler == "c2d":
-            p = subprocess.Popen([os.path.join(src_path, "c2d/bin/c2d_linux"), "-smooth_all", "-reduce", "-in", file_name, "-dt_in", file_name + ".dtree", "-cache_size", "3500"], stdout=out)
+            p = subprocess.Popen([os.path.join(src_path, "c2d/bin/c2d_linux"), "-smooth_all", "-reduce", "-in", file_name, "-dt_in", file_name + ".dtree", "-cache_size", "3500"], stdout=subprocess.PIPE)
         elif knowledge_compiler == "miniC2D":            
-            p = subprocess.Popen([os.path.join(src_path, "miniC2D/bin/linux/miniC2D"), "-c", file_name, "-v", file_name + ".vtree", "-s" , "3500"], stdout=out)
+            p = subprocess.Popen([os.path.join(src_path, "miniC2D/bin/linux/miniC2D"), "-c", file_name, "-v", file_name + ".vtree", "-s" , "3500"], stdout=subprocess.PIPE)
         elif knowledge_compiler == "sharpsat-td":
             decot = float(config.config["decot"])
             decot = max(decot, 0.1)
-            p = subprocess.Popen(["./sharpSAT", "-dDNNF", "-decot", str(decot), "-decow", "100", "-tmpdir", "/tmp/", "-cs", "3500", file_name, "-dDNNF_out", file_name + ".nnf"], cwd=os.path.join(src_path, "sharpsat-td/bin/"), stdout=out)
+            p = subprocess.Popen(["./sharpSAT", "-dDNNF", "-decot", str(decot), "-decow", "100", "-tmpdir", "/tmp/", "-cs", "3500", file_name, "-dDNNF_out", file_name + ".nnf"], cwd=os.path.join(src_path, "sharpsat-td/bin/"), stdout=subprocess.PIPE)
         elif knowledge_compiler == "d4":
-            p = subprocess.Popen([os.path.join(src_path, "d4/d4_static"), file_name, "-dDNNF", f"-out={file_name}.nnf", "-smooth"], stdout=out)
+            p = subprocess.Popen([os.path.join(src_path, "d4/d4_static"), file_name, "-dDNNF", f"-out={file_name}.nnf", "-smooth"], stdout=subprocess.PIPE)
+        
+        for line in iter(p.stdout.readline, b''):
+            line = line.decode()
+            logger.debug(line[:-1])
         p.wait()
-        if not logger.isEnabledFor(logging._nameToLevel["DEBUG"]):
-            p.stdout.close()
+        p.stdout.close()
 
         if p.returncode != 0:
             logger.error(f"Knowledge compilation failed with exit code {p.returncode}.")
@@ -649,21 +648,22 @@ class CNF(object):
             None
         """
         my_signals.tempfiles.add(file_name + '.nnf')
-        if logger.isEnabledFor(logging._nameToLevel["DEBUG"]):
-            logger.debug("Knowledge compiler output:")
-            out = sys.stdout.buffer
-        else:
-            out = subprocess.PIPE
+        logger.debug("Knowledge compiler output:")
+
         if knowledge_compiler == "c2d":
-            p = subprocess.Popen([os.path.join(src_path, "c2d/bin/c2d_linux"), "-cache_size", "3500", "-keep_trivial_cls", "-smooth_all", "-in", file_name, "-dt_in", file_name + ".dtree", "-force", file_name + ".force"], stdout=out)
+            p = subprocess.Popen([os.path.join(src_path, "c2d/bin/c2d_linux"), "-cache_size", "3500", "-keep_trivial_cls", "-smooth_all", "-in", file_name, "-dt_in", file_name + ".dtree", "-force", file_name + ".force"], stdout=subprocess.PIPE)
         elif knowledge_compiler == "miniC2D":
-            p = subprocess.Popen([os.path.join(src_path, "miniC2D/bin/linux/miniC2D"), "-c", file_name, "-v", file_name + ".vtree", "-s" , "3500"], stdout=out)
+            p = subprocess.Popen([os.path.join(src_path, "miniC2D/bin/linux/miniC2D"), "-c", file_name, "-v", file_name + ".vtree", "-s" , "3500"], stdout=subprocess.PIPE)
         else:
             logger.error(f"Knowledge compiler {config.config['knowledge_compiler']} does not support X/D-constrained compilation")
             exit(-1)
+
+        for line in iter(p.stdout.readline, b''):
+            line = line.decode()
+            logger.debug(line[:-1])
         p.wait()
-        if not logger.isEnabledFor(logging._nameToLevel["DEBUG"]):
-            p.stdout.close()
+        p.stdout.close()
+
         if p.returncode != 0:
             logger.error(f"Knowledge compilation failed with exit code {p.exitcode}.")
             exit(-1) 
@@ -793,6 +793,8 @@ class CNF(object):
             elif len(self.semirings) == 1 and config.config["knowledge_compiler"] == "sharpsat-td"\
                  and self.semirings[0].__name__ == "aspmc.semirings.probabilistic":
                 return self.solve_wmc()
+            elif len(self.semirings) == 0 and config.config["knowledge_compiler"] == "sharpsat-td":
+                return self.solve_mc()
             else:
                 return self.solve_compilation(preprocessing = preprocessing)
         elif strategy == "compilation":
@@ -944,12 +946,43 @@ class CNF(object):
         decot = float(config.config["decot"])
         decot = max(decot, 0.1)
         p = subprocess.Popen(["./sharpSAT", "-MWD", str(len(self.weights[1])), "-decot", str(decot), "-decow", "100", "-tmpdir", "/tmp/", "-cs", "3500", cnf_tmp], cwd=os.path.join(src_path, "sharpsat-td/bin/"), stdout=subprocess.PIPE)
-        p.wait()
-        for line in p.stdout.readlines():
+        result = None
+        logger.debug("Solver output:")
+        for line in iter(p.stdout.readline, b''):
             line = line.decode()
             if line.startswith("c s exact arb float "):
-                line = line[len("c s exact arb float "):]
-                result = np.array([ float(v) for v in line.split(";") ])
+                result = np.array([ float(line[len("c s exact arb float "):-1]) ])
+            logger.debug(line[:-1])
+        p.wait()
+        p.stdout.close()
+        if result is None:
+            raise SolvingError("Model Counter did not print a solution!")
+        
+        logger.info(f"Counting time:         {time.time() - start}")
+        logger.info("------------------------------------------------------------")
+        os.remove(cnf_tmp)
+        my_signals.tempfiles.add(cnf_tmp)
+        return result
+
+    def solve_mc(self):
+        _, cnf_tmp = tempfile.mkstemp()
+        my_signals.tempfiles.add(cnf_tmp)
+        logger.debug(f"    CNF file: {cnf_tmp}")
+        self.to_file(cnf_tmp, extras=False)
+        logger.info("   Stats Model Counter")
+        logger.info("------------------------------------------------------------")
+        start = time.time()
+        decot = float(config.config["decot"])
+        decot = max(decot, 0.1)
+        p = subprocess.Popen(["./sharpSAT", "-decot", str(decot), "-decow", "100", "-tmpdir", "/tmp/", "-cs", "3500", cnf_tmp], cwd=os.path.join(src_path, "sharpsat-td/bin/"), stdout=subprocess.PIPE)
+        result = None
+        logger.debug("Solver output:")
+        for line in iter(p.stdout.readline, b''):
+            line = line.decode()
+            if line.startswith("c s exact arb int "):
+                result = np.array([ int(line[len("c s exact arb int "):-1]) ])
+            logger.debug(line[:-1])
+        p.wait()
         p.stdout.close()
         if result is None:
             raise SolvingError("Model Counter did not print a solution!")
