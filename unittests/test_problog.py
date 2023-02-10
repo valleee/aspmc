@@ -81,4 +81,4 @@ class TestProblog(unittest.TestCase):
                 self.assertAlmostEqual(results[i], expected[i])
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(buffer=True)

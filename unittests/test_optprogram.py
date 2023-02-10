@@ -61,4 +61,4 @@ class TestOptProgram(unittest.TestCase):
         self.assertAlmostEqual(results[0].value, expected)
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(buffer=True)
