@@ -567,6 +567,11 @@ class CNF(object):
             p = subprocess.Popen(["./sharpSAT", "-dDNNF", "-decot", str(decot), "-decow", "100", "-tmpdir", "/tmp/", "-cs", "3500", cnf_tmp], cwd=os.path.join(src_path, "sharpsat-td/bin/"), stdout=subprocess.PIPE)
             weights, zero, one, dtype = self.get_weights()
             results = Circuit.live_parse_wmc(p.stdout, weights, zero = zero, one = one, dtype = dtype)
+            p.wait()
+            p.stdout.close()        
+            if p.returncode != 0:
+                logger.error(f"Knowledge compilation failed with exit code {p.exitcode}.")
+                exit(-1) 
             end = time.time()
             logger.info(f"Counting & Compilation time:  {end - start}")
             os.remove(cnf_tmp)
@@ -951,7 +956,7 @@ class CNF(object):
         for line in iter(p.stdout.readline, b''):
             line = line.decode()
             if line.startswith("c s exact arb float "):
-                result = np.array([ float(line[len("c s exact arb float "):-1]) ])
+                result = np.array([ float(part) for part in line[len("c s exact arb float "):-1].split(";") ])
             logger.debug(line[:-1])
         p.wait()
         p.stdout.close()
