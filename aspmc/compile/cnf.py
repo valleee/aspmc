@@ -510,12 +510,14 @@ class CNF(object):
         """Compiles a CNF into a tractable circuit. The output circuit is in the file `file_name + ".nnf"`.
 
         Currently supports c2d, miniC2D, d4 and sharpsat-td as knowledge compilers. 
-        Generates a D/Vtree from a tree decomposition of the cnf for all knowledge compilers except d4.
-        How the tree decomposition is generated and which knowledge compiler is used is configured in aspmc.config.
 
         For c2d assumes that there is:
-            * A cnf file `file_name`.
-            * A dtree file `file_name + ".dtree"`.
+            * a cnf file `file_name`.
+            * a dtree file `file_name + ".dtree"`.
+            * (optionally) a variable file `file_name + ".exist"`,
+                specifying that the variables in the file should be projected away.
+                auxilliary variables are safe to project away.
+                the resulting circuit will not be smooth if the exist file is provided!
 
         For miniC2D assumes that there is:
             * a cnf file `file_name`.
@@ -538,7 +540,10 @@ class CNF(object):
         my_signals.tempfiles.add(file_name + '.nnf')
         logger.debug("Knowledge compiler output:")
         if knowledge_compiler == "c2d":
-            p = subprocess.Popen([os.path.join(src_path, "c2d/bin/c2d_linux"), "-smooth_all", "-reduce", "-in", file_name, "-dt_in", file_name + ".dtree", "-cache_size", "3500"], stdout=subprocess.PIPE)
+            if os.path.isfile(f"{file_name}.exist"):
+                p = subprocess.Popen([os.path.join(src_path, "c2d/bin/c2d_linux"), "-reduce", "-in", file_name, "-dt_in", file_name + ".dtree", "-cache_size", "3500", "-exist", file_name + ".exist"], stdout=subprocess.PIPE)
+            else:
+                p = subprocess.Popen([os.path.join(src_path, "c2d/bin/c2d_linux"), "-smooth_all", "-reduce", "-in", file_name, "-dt_in", file_name + ".dtree", "-cache_size", "3500"], stdout=subprocess.PIPE)
         elif knowledge_compiler == "miniC2D":            
             p = subprocess.Popen([os.path.join(src_path, "miniC2D/bin/linux/miniC2D"), "-c", file_name, "-v", file_name + ".vtree", "-s" , "3500"], stdout=subprocess.PIPE)
         elif knowledge_compiler == "sharpsat-td":
@@ -601,6 +606,12 @@ class CNF(object):
             my_signals.tempfiles.add(cnf_tmp + '.dtree')
             end = time.time()
             logger.info(f"Dtree time:               {end - start}")
+            if len(self.semirings) == 1 and self.semirings[0].__name__ == "aspmc.semirings.probabilistic":
+                # careful: with other semirings this does not generally work, since the "-smooth_all" option of c2d is necessary in general then
+                # this is a problem since -smooth_all also adds the variables that were existentially quantified away again
+                with open(cnf_tmp + '.exist', 'w') as exist_file:
+                    exist_file.write(f"{len(self.auxilliary)} {' '.join( str(v) for v in self.auxilliary )}")
+                my_signals.tempfiles.add(cnf_tmp + '.exist')
         elif config.config["knowledge_compiler"] == "miniC2D":            
             with os.fdopen(cnf_fd, 'wb') as cnf_file:
                 self.to_stream(cnf_file)
@@ -636,6 +647,9 @@ class CNF(object):
         if config.config["knowledge_compiler"] == "c2d":
             os.remove(cnf_tmp + ".dtree")
             my_signals.tempfiles.remove(cnf_tmp + '.dtree')
+            if (cnf_tmp + ".exist") in my_signals.tempfiles:
+                os.remove(cnf_tmp + ".exist")
+                my_signals.tempfiles.remove(cnf_tmp + '.exist')
         elif config.config["knowledge_compiler"] == "miniC2D":
             os.remove(cnf_tmp + ".vtree")
             my_signals.tempfiles.remove(cnf_tmp + '.vtree')
