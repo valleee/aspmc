@@ -758,6 +758,13 @@ class Program(object):
             None        
         """
         self._cnf = CNF()
+        self._cnf.nr_vars = self._max
+        # local method to get a new auxilliary variable
+        # so that the atom counter of the program does not change
+        def aux_var():
+            self._cnf.nr_vars += 1
+            return self._cnf.nr_vars
+
         perAtom = {}
         for a in self._deriv:
             perAtom[a] = []
@@ -769,7 +776,7 @@ class Program(object):
         for head in self._deriv:
             ors = []
             for r in perAtom[head]:
-                ors.append(self._new_var(f"{r}"))
+                ors.append(aux_var())
                 ands = [-x for x in r.body]
                 self._cnf.clauses.append([ors[-1]] + ands)
                 for at in ands:
@@ -793,7 +800,6 @@ class Program(object):
                     if v < vp:
                         self._cnf.clauses.append([-v, -vp])
                             
-        self._cnf.nr_vars = self._max
         self._finalize_cnf()
 
     def td_guided_clark_completion(self):        
@@ -812,6 +818,13 @@ class Program(object):
             None        
         """
         self._cnf = CNF()
+        self._cnf.nr_vars = self._max
+        # local method to get a new auxilliary variable
+        # so that the atom counter of the program does not change
+        def aux_var():
+            self._cnf.nr_vars += 1
+            return self._cnf.nr_vars
+        
         self._decomposeGraph(solver = config.config["decos"], timeout = config.config["decot"])
         logger.info(f"Tree Decomposition #bags: {self._td.bags} unfolded treewidth: {self._td.width} #vertices: {self._td.vertices}")
         # at which td node to handle each rule
@@ -829,7 +842,7 @@ class Program(object):
 
         for r in self._program:
             for a in r.head:
-                r.proven = self._new_var(f"{r}")
+                r.proven = aux_var()
                 ands = [-x for x in r.body]
                 self._cnf.clauses.append([ r.proven ] + ands)
                 for at in ands:
@@ -868,7 +881,7 @@ class Program(object):
             # handle all the rules we have gathered
             for a in t.vertices:
                 if len(to_handle[a]) > 1:
-                    new_last = self._new_var("{t},{a}")
+                    new_last = aux_var()
                     self._cnf.clauses.append([-new_last] + to_handle[a])
                     for at in to_handle[a]:
                         self._cnf.clauses.append([new_last, -at])
@@ -900,7 +913,6 @@ class Program(object):
                     if v < vp:
                         self._cnf.clauses.append([-v, -vp])
 
-        self._cnf.nr_vars = self._max
         self._finalize_cnf()
 
 
@@ -921,6 +933,13 @@ class Program(object):
             None        
         """
         self._cnf = CNF()
+        self._cnf.nr_vars = self._max
+        # local method to get a new auxilliary variable
+        # so that the atom counter of the program does not change
+        def aux_var():
+            self._cnf.nr_vars += 1
+            return self._cnf.nr_vars
+
         # remember whats an and, whats an or and whats a constraint
         # also include the guesses, which guess exactly one of their inputs to be true
         OR = 0
@@ -932,7 +951,7 @@ class Program(object):
 
         exactly_one_to_var = {}
         for a in self._exactlyOneOf:
-            exactly_one_to_var[a] = self._new_var(f"{a}")
+            exactly_one_to_var[a] = aux_var()
             nodes[exactly_one_to_var[a]] = (GUESS, set(a))
 
         for atom in self._guess:
@@ -950,7 +969,7 @@ class Program(object):
         else:
             remaining = self._program
         for r in remaining:
-            r.proven = self._new_var(f"{r}")
+            r.proven = aux_var()
             if len(r.head) != 0:
                 nodes[r.proven] = (AND, set(r.body))
                 nodes[abs(r.head[0])][1].add(r.proven)
@@ -967,29 +986,29 @@ class Program(object):
 
         # set up the and/or graph
         graph = nx.Graph()
-        graph.add_nodes_from(range(1, self._max + 1))
+        graph.add_nodes_from(range(1, self._cnf.nr_vars + 1))
         for r in self._program:
             if len(r.body) > 0:
                 for atom in r.head:
                     graph.add_edge(atom, r.proven)
                     if adaptive:
-                        graph.add_edge(atom + self._max, r.proven)
+                        graph.add_edge(atom + self._cnf.nr_vars, r.proven)
                 for atom in r.body:
                     graph.add_edge(r.proven, abs(atom))
                     if adaptive:
-                        graph.add_edge(r.proven + self._max, abs(atom))
+                        graph.add_edge(r.proven + self._cnf.nr_vars, abs(atom))
         
         for a in self._exactlyOneOf:
             for atom in a:
                 graph.add_edge(exactly_one_to_var[a], atom)
                 if adaptive:
-                    graph.add_edge(exactly_one_to_var[a] + self._max, atom)
+                    graph.add_edge(exactly_one_to_var[a] + self._cnf.nr_vars, atom)
 
 
         td = treedecomposition.from_graph(graph, solver = config.config["decos"], timeout = config.config["decot"])
         if adaptive:
-            td.remove(set(range(self._max + 1, 2*self._max + 1)))
-            td.vertices = self._max 
+            td.remove(set(range(self._cnf.nr_vars + 1, 2*self._cnf.nr_vars + 1)))
+            td.vertices = self._cnf.nr_vars 
         logger.info(f"Tree Decomposition #bags: {td.bags} unfolded treewidth: {td.width} #vertices: {td.vertices}")
 
         
@@ -1018,7 +1037,7 @@ class Program(object):
                             first_lit = unfinished[tp][atom].pop()
                         else:
                             node_type = nodes[atom][0]
-                            first_lit = self._new_var("")
+                            first_lit = aux_var()
                             if node_type == AND:
                                 bigAnd = [ first_lit ] + [ -v for v in unfinished[tp][atom] ]
                                 self._cnf.clauses.append(bigAnd)                  
@@ -1045,7 +1064,7 @@ class Program(object):
                             second_lit = unfinished[t][atom].pop()
                         else:
                             node_type = nodes[atom][0]
-                            second_lit = self._new_var("")
+                            second_lit = aux_var()
                             if node_type == AND:
                                 bigAnd = [ second_lit ] + [ -v for v in unfinished[t][atom] ]
                                 self._cnf.clauses.append(bigAnd)
@@ -1084,7 +1103,7 @@ class Program(object):
                         if len(unfinished[t][a]) == 1:
                             first_lit = unfinished[t][a].pop()
                         else:
-                            first_lit = self._new_var("")
+                            first_lit = aux_var()
                             if node_type == AND:
                                 bigAnd = [ first_lit ] + [ -v for v in unfinished[t][a] ]
                                 self._cnf.clauses.append(bigAnd)
@@ -1110,7 +1129,7 @@ class Program(object):
                         if len(todo_new) == 1:
                             second_lit = todo_new.pop()
                         else:
-                            second_lit = self._new_var("")
+                            second_lit = aux_var()
                             if node_type == AND:
                                 bigAnd = [ second_lit ] + [ -v for v in todo_new ]
                                 self._cnf.clauses.append(bigAnd)
@@ -1178,7 +1197,7 @@ class Program(object):
                             if len(unfinished[t][a]) == 1:
                                 inputs.add(unfinished[t][a].pop())
                             else:
-                                new_lit = self._new_var("")
+                                new_lit = aux_var()
                                 if node_type == AND:
                                     bigAnd = [ new_lit ] + [ -v for v in unfinished[t][a] ]
                                     self._cnf.clauses.append(bigAnd)
@@ -1236,7 +1255,7 @@ class Program(object):
                             if len(unfinished[t][a]) == 1:
                                 first_lit = unfinished[t][a].pop()
                             else:
-                                first_lit = self._new_var("")
+                                first_lit = aux_var()
                                 if node_type == AND:
                                     bigAnd = [ first_lit ] + [ -v for v in unfinished[t][a] ]
                                     self._cnf.clauses.append(bigAnd)
@@ -1262,7 +1281,7 @@ class Program(object):
                             if len(todo_new) == 1:
                                 second_lit = todo_new.pop()
                             else:
-                                second_lit = self._new_var("")
+                                second_lit = aux_var()
                                 if node_type == AND:
                                     bigAnd = [ second_lit ] + [ -v for v in todo_new ]
                                     self._cnf.clauses.append(bigAnd)
@@ -1316,7 +1335,6 @@ class Program(object):
                                 self._cnf.clauses.append([-v, -vp])
                     self._cnf.clauses.append([-a])
 
-        self._cnf.nr_vars = self._max
         self._finalize_cnf()
 
     def choose_clark_completion(self):
@@ -1634,12 +1652,13 @@ class Program(object):
         Returns:
             :obj:`aspmc.compile.cnf.CNF`: Returns the extended cnf of the program.        
         """
-        if "debug" in kwargs:
-            stream.write(f"p cnf {self._max} {len(self._cnf.clauses)}\n".encode())
-            for c in self._cnf.clauses:
-                stream.write((" ".join([("(not " if v < 0 else "(") + self._external_name(abs(v)) + ")" for v in c]) + " 0\n" ).encode())
-        else:
-            self._cnf.to_stream(stream)
+        # FIXME: this does not work anymore since auxilliary cnf vars do not have a name
+        # if "debug" in kwargs:
+        #     stream.write(f"p cnf {self._cnf.nr_vars} {len(self._cnf.clauses)}\n".encode())
+        #     for c in self._cnf.clauses:
+        #         stream.write((" ".join([("(not " if v < 0 else "(") + self._external_name(abs(v)) + ")" for v in c]) + " 0\n" ).encode())
+        # else:
+        self._cnf.to_stream(stream)
 
 
     def _prog_string(self, program):

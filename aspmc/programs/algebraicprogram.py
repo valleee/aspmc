@@ -220,15 +220,15 @@ class AlgebraicProgram(Program):
 
     def _finalize_cnf(self):
         weight_list = self.get_weights()
-        for v in range(self._max*2):
+        for v in range(self._cnf.nr_vars*2):
             self._cnf.weights[to_dimacs(v)] = weight_list[v]
         self._cnf.semirings = [ self.semiring ]
-        self._cnf.quantified = [ list(range(1, self._max + 1)) ]
+        self._cnf.quantified = [ list(range(1, self._cnf.nr_vars + 1)) ]
 
     def get_weights(self):
         query_cnt = max(len(self.queries), 1)
         varMap = { name : var for var, name in self._nameMap.items() }
-        weight_list = [ np.full(query_cnt, self.semiring.one(), dtype=self.semiring.dtype) for _ in range(self._max*2) ]
+        weight_list = [ np.full(query_cnt, self.semiring.one(), dtype=self.semiring.dtype) for _ in range(self._cnf.nr_vars*2) ]
         for (name, phase) in self.weights:
             if phase:
                 weight_list[to_pos(varMap[name])] = np.full(query_cnt, self.weights[(name, phase)], dtype=self.semiring.dtype)

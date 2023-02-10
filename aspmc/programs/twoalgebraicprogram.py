@@ -60,7 +60,7 @@ class TwoAlgebraicProgram(Program):
         first = set([ int(str(varMap[name])) for (name, _) in self.first_weights ])
         second = set([ int(str(varMap[name])) for (name, _) in self.second_weights ])
         self._cnf.quantified = [first, second]
-        for v in range(self._max*2):
+        for v in range(self._cnf.nr_vars*2):
             self._cnf.weights[to_dimacs(v)] = weight_list[v]
         self._cnf.transform = self.transform
         self._cnf.semirings = [ self.first_semiring, self.second_semiring ]
@@ -70,8 +70,8 @@ class TwoAlgebraicProgram(Program):
         first_shape = (query_cnt, ) + np.shape(self.first_semiring.one())
         second_shape = (query_cnt, ) + np.shape(self.second_semiring.one())
         varMap = { name : var for var, name in self._nameMap.items() }
-        weight_list = [ np.empty(second_shape, dtype=self.second_semiring.dtype) for _ in range(self._max*2) ]
-        for i in range(self._max*2):
+        weight_list = [ np.empty(second_shape, dtype=self.second_semiring.dtype) for _ in range(self._cnf.nr_vars*2) ]
+        for i in range(self._cnf.nr_vars*2):
             weight_list[i][:] = self.second_semiring.one()
         for (name, phase) in self.first_weights:
             idx = to_pos(varMap[name])
