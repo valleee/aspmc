@@ -763,6 +763,7 @@ class Program(object):
         # so that the atom counter of the program does not change
         def aux_var():
             self._cnf.nr_vars += 1
+            self._cnf.auxilliary.add(self._cnf.nr_vars)
             return self._cnf.nr_vars
 
         perAtom = {}
@@ -823,6 +824,7 @@ class Program(object):
         # so that the atom counter of the program does not change
         def aux_var():
             self._cnf.nr_vars += 1
+            self._cnf.auxilliary.add(self._cnf.nr_vars)
             return self._cnf.nr_vars
         
         self._decomposeGraph(solver = config.config["decos"], timeout = config.config["decot"])
@@ -938,6 +940,7 @@ class Program(object):
         # so that the atom counter of the program does not change
         def aux_var():
             self._cnf.nr_vars += 1
+            self._cnf.auxilliary.add(self._cnf.nr_vars)
             return self._cnf.nr_vars
 
         # remember whats an and, whats an or and whats a constraint

@@ -47,6 +47,9 @@ class CNF(object):
         * clauses: one line for each clause `c = [lit_1, lit_2, ..., lit_n]`.
 
             `<lit_1> <lit_2> ... <lit_n> 0`
+        * auxilliary: one line specifying a list `[v_1, ..., v_n]` of variables that may be projected away without changing the evaluation result.
+        
+            `c p auxilliary <v_1> <v_2> ... <v_n> 0`
         * weights: one line for each weight "w = np.array([w_1, w_2, ..., w_n])" of a literal `lit`.
 
             `c p weight <lit> <w_1>;<w_2>;...;<w_n> 0`
@@ -67,6 +70,7 @@ class CNF(object):
     Attributes:
         clauses (list): A list of clauses with literals in minisat format.
         nr_vars (int): The number of variables that the cnf is specified over.
+        auxilliary (set): A set of variables that may be projected away without changing the evaluation result.
         weights (dict): A dictionary that can contain for each integer from {-nr_vars, ..., -1, 1, ..., nr_vars} a weight over a semiring.
             Note that even if there is only one semiring value it must be encapsulated in a numpy array.
         semirings (list): A list of semiring modules that are used in this cnf.
@@ -84,6 +88,7 @@ class CNF(object):
         assert(path is None or string is None)
         self.clauses = []
         self.nr_vars = 0
+        self.auxilliary = set()
         self.weights = {}
         self.semirings = []
         self.quantified = []
@@ -104,6 +109,8 @@ class CNF(object):
                                 self.transform = ' '.join(line[3:-1])
                             elif line[2] == "quantify":
                                 self.quantified.append([int(x) for x in line[3:-1]])
+                            elif line[2] == "auxilliary":
+                                self.auxilliary.update([int(x) for x in line[3:-1]])
                             else:
                                 logger.error(f"Unknown property {line[2]}!")
                             if line[-1] != '0':
@@ -129,6 +136,8 @@ class CNF(object):
                             self.transform = ' '.join(line[3:-1])
                         elif line[2] == "quantify":
                             self.quantified.append([int(x) for x in line[3:-1]])
+                        elif line[2] == "auxilliary":
+                                self.auxilliary.update([int(x) for x in line[3:-1]])
                         else:
                             logger.error(f"Unknown property {line[2]}!")
                         if line[-1] != '0':
@@ -174,6 +183,7 @@ class CNF(object):
             ret += f"c p transform {self.transform} 0\n"
         for l in self.quantified:
             ret += f"c p quantify {' '.join([str(x) for x in l])} 0\n"
+        ret += f"c p auxilliary {' '.join([str(x) for x in self.auxilliary])} 0\n"
         return ret
 
     def write_kc_cnf(self, out_file):
@@ -181,8 +191,9 @@ class CNF(object):
         for c in self.clauses:
             out_file.write(f"{' '.join([str(l) for l in c])} 0\n".encode())
         for idx in range(1, self.nr_vars + 1):
-            out_file.write(f"c p weight {idx} {idx} 0\n".encode())
-            out_file.write(f"c p weight {-idx} {-idx} 0\n".encode())
+            if idx not in self.auxilliary:
+                out_file.write(f"c p weight {idx} {idx} 0\n".encode())
+                out_file.write(f"c p weight {-idx} {-idx} 0\n".encode())
 
     def write_maxsat_cnf(self, out_file):
         import math
@@ -328,6 +339,7 @@ class CNF(object):
                     file_out.write(f"c p transform {self.transform} 0\n")
                 for l in self.quantified:
                     file_out.write(f"c p quantify {' '.join([str(x) for x in l])} 0\n")
+                file_out.write(f"c p auxilliary {' '.join([str(x) for x in self.auxilliary])} 0\n")
             
 
     def to_stream(self, stream, extras = False):
@@ -356,6 +368,7 @@ class CNF(object):
                 stream.write(f"c p transform {self.transform} 0\n".encode())
             for l in self.quantified:
                 stream.write(f"c p quantify {' '.join([str(x) for x in l])} 0\n".encode())
+            stream.write(f"c p auxilliary {' '.join([str(x) for x in self.auxilliary])} 0\n".encode())
 
     def primal_graph(self):
         """Construct the an `nx.Graph` that corresponds to the primal graph of the cnf.

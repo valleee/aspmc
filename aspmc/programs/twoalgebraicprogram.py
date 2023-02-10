@@ -64,6 +64,7 @@ class TwoAlgebraicProgram(Program):
             self._cnf.weights[to_dimacs(v)] = weight_list[v]
         self._cnf.transform = self.transform
         self._cnf.semirings = [ self.first_semiring, self.second_semiring ]
+        # TODO figure out which variables we can mark as auxilliary
 
     def get_weights(self):
         query_cnt = max(len(self.get_queries()), 1)
