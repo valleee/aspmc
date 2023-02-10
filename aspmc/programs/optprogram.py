@@ -126,7 +126,7 @@ class OptProgram(Program):
             self._cnf.weights[to_dimacs(v)] = weight_list[v]
         self._cnf.semirings = [ self.semiring ]
         self._cnf.quantified = [ list(range(1, self._cnf.nr_vars + 1)) ]
-        query_cnt = max(len(self.queries), 1)
+        query_cnt = 1
         for v in self._deriv:
             if all(self._cnf.weights[v][i] == self.semiring.one() and self._cnf.weights[-v][i] == self.semiring.one() for i in range(query_cnt)):
                 self._cnf.auxilliary.add(v)
