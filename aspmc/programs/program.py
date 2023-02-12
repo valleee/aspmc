@@ -1620,7 +1620,8 @@ class Program(object):
             out_file.write(f"{and_aig}")
 
     def _finalize_cnf(self):
-        pass
+        for l in self._copies.values():
+            self._cnf.auxilliary.update(l)
 
     def encoding_stats(self):
         """Print the stats of a tree decomposition of the cnf. 
