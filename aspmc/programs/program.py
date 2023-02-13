@@ -100,6 +100,8 @@ class Program(object):
         self._guess = set()
         self._deriv = set()
         self._copies = {}
+        # remember possible auxilliary variables that clingo introduced
+        self._auxilliary = set()
         # the list containing all the rules (except guesses)
         self._program = []
         # remember which atoms have to satisfy an exactly one of constraint
@@ -144,7 +146,9 @@ class Program(object):
                     if a in symbol_map:
                         _atomToVertex[a] = self._new_var(symbol_map[a])
                     else:
-                        _atomToVertex[a] = self._new_var(f"projected_away({a})")
+                        aux_var = self._new_var(f"projected_away({a})")
+                        _atomToVertex[a] = aux_var
+                        self._auxilliary.add(aux_var)
 
         trans_prog = set()
         self._deriv = set(range(1,self._max + 1))
