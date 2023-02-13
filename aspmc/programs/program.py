@@ -1626,6 +1626,7 @@ class Program(object):
     def _finalize_cnf(self):
         for l in self._copies.values():
             self._cnf.auxilliary.update(l)
+        self._cnf.auxilliary.update(self._auxilliary)
 
     def encoding_stats(self):
         """Print the stats of a tree decomposition of the cnf. 
