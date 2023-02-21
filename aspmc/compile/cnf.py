@@ -551,7 +551,7 @@ class CNF(object):
         elif knowledge_compiler == "sharpsat-td":
             decot = float(config.config["decot"])
             decot = max(decot, 0.1)
-            p = subprocess.Popen(["./sharpSAT", "-dDNNF", "-decot", str(decot), "-decow", "100", "-tmpdir", "/tmp/", "-cs", str(available_memory//2), file_name, "-dDNNF_out", file_name + ".nnf"], cwd=os.path.join(src_path, "sharpsat-td/bin/"), stdout=subprocess.PIPE)
+            p = subprocess.Popen(["./sharpSAT", "-dDNNF", "-decot", str(decot), "-decow", "10000", "-tmpdir", "/tmp/", "-cs", str(available_memory//2), file_name, "-dDNNF_out", file_name + ".nnf"], cwd=os.path.join(src_path, "sharpsat-td/bin/"), stdout=subprocess.PIPE)
         elif knowledge_compiler == "d4":
             p = subprocess.Popen([os.path.join(src_path, "d4/d4_static"), file_name, "-dDNNF", f"-out={file_name}.nnf", "-smooth"], stdout=subprocess.PIPE)
         
@@ -586,7 +586,7 @@ class CNF(object):
             decot = max(decot, 0.1)
             # compute the available memory to set the cache size
             available_memory = max(psutil.virtual_memory().available//1024**2 - 125, 1000)
-            p = subprocess.Popen(["./sharpSAT", "-dDNNF", "-decot", str(decot), "-decow", "100", "-tmpdir", "/tmp/", "-cs", str(available_memory//2), cnf_tmp], cwd=os.path.join(src_path, "sharpsat-td/bin/"), stdout=subprocess.PIPE)
+            p = subprocess.Popen(["./sharpSAT", "-dDNNF", "-decot", str(decot), "-decow", "10000", "-tmpdir", "/tmp/", "-cs", str(available_memory//2), cnf_tmp], cwd=os.path.join(src_path, "sharpsat-td/bin/"), stdout=subprocess.PIPE)
             weights, zero, one, dtype = self.get_weights()
             results = Circuit.live_parse_wmc(p.stdout, weights, zero = zero, one = one, dtype = dtype)
             p.wait()
@@ -986,7 +986,7 @@ class CNF(object):
         decot = max(decot, 0.1)
         # compute the available memory to set the cache size
         available_memory = max(psutil.virtual_memory().available//1024**2 - 125, 1000)
-        p = subprocess.Popen(["./sharpSAT", "-MWD", str(len(self.weights[1])), "-decot", str(decot), "-decow", "100", "-tmpdir", "/tmp/", "-cs", str(available_memory//2), cnf_tmp], cwd=os.path.join(src_path, "sharpsat-td/bin/"), stdout=subprocess.PIPE)
+        p = subprocess.Popen(["./sharpSAT", "-MWD", str(len(self.weights[1])), "-decot", str(decot), "-decow", "10000", "-tmpdir", "/tmp/", "-cs", str(available_memory//2), cnf_tmp], cwd=os.path.join(src_path, "sharpsat-td/bin/"), stdout=subprocess.PIPE)
         result = None
         logger.debug("Solver output:")
         for line in iter(p.stdout.readline, b''):
@@ -1017,7 +1017,7 @@ class CNF(object):
         decot = max(decot, 0.1)
         # compute the available memory to set the cache size
         available_memory = max(psutil.virtual_memory().available//1024**2 - 125, 1000)
-        p = subprocess.Popen(["./sharpSAT", "-decot", str(decot), "-decow", "100", "-tmpdir", "/tmp/", "-cs", str(available_memory//2), cnf_tmp], cwd=os.path.join(src_path, "sharpsat-td/bin/"), stdout=subprocess.PIPE)
+        p = subprocess.Popen(["./sharpSAT", "-decot", str(decot), "-decow", "10000", "-tmpdir", "/tmp/", "-cs", str(available_memory//2), cnf_tmp], cwd=os.path.join(src_path, "sharpsat-td/bin/"), stdout=subprocess.PIPE)
         result = None
         logger.debug("Solver output:")
         for line in iter(p.stdout.readline, b''):
