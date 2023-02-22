@@ -101,7 +101,8 @@ class CNF(object):
                     if line[0] == 'c':
                         if len(line) > 2 and line[1] == 'p':
                             if line[2] == "weight":
-                                self.weights[int(line[3])] = ' '.join(line[4:-1])
+                                if int(line[3]) != 0:
+                                    self.weights[int(line[3])] = ' '.join(line[4:-1])
                             elif line[2] == "semirings":
                                 self.semirings = [ importlib.import_module(mod) for mod in line[3:-1] ]
                             elif line[2] == "transform":
@@ -157,6 +158,10 @@ class CNF(object):
         if len(self.semirings) == 2 and self.transform is None:
             logger.error("If there are multiple semirings, we need a transform between them.")
             exit(-1)
+        if len(self.weights) > 0 and len(self.quantified) == 0:
+            self.quantified = [ set(range(1,self.nr_vars + 1)) ]
+            import aspmc.semirings.probabilistic
+            self.semirings = [ aspmc.semirings.probabilistic ]
         for idx in self.weights:
             if abs(idx) in self.quantified[0]:
                 self.weights[idx] = np.array([ self.semirings[0].parse(w) for w in self.weights[idx].split(";") ])
@@ -986,7 +991,11 @@ class CNF(object):
         decot = max(decot, 0.1)
         # compute the available memory to set the cache size
         available_memory = max(psutil.virtual_memory().available//1024**2 - 125, 1000)
-        p = subprocess.Popen(["./sharpSAT", "-MWD", str(len(self.weights[1])), "-decot", str(decot), "-decow", "10000", "-tmpdir", "/tmp/", "-cs", str(available_memory//2), cnf_tmp], cwd=os.path.join(src_path, "sharpsat-td/bin/"), stdout=subprocess.PIPE)
+        first = None
+        for weight in self.weights.values():
+            first = weight
+            break
+        p = subprocess.Popen(["./sharpSAT", "-MWD", str(len(first)), "-decot", str(decot), "-decow", "10000", "-tmpdir", "/tmp/", "-cs", str(available_memory//2), cnf_tmp], cwd=os.path.join(src_path, "sharpsat-td/bin/"), stdout=subprocess.PIPE)
         result = None
         logger.debug("Solver output:")
         for line in iter(p.stdout.readline, b''):
