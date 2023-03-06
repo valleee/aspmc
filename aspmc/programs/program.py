@@ -109,6 +109,141 @@ class Program(object):
         # the tree decomposition of the program
         self._td = None
         self._normalize(clingo_control)
+        #self._remove_irrelevant_rules_asp()
+        self._remove_irrelevant_rules_problog()
+
+    def _remove_irrelevant_rules_asp(self):
+        print("--- REMOVE IRRELEVANT RULES asp ---")
+        dep_graph = nx.DiGraph()
+        constraint_atoms = []
+        for rule in self._program:
+            if len(rule.head) == 0:
+                 for body_atom in rule.body:
+                    constraint_atoms.append(body_atom)
+            else:
+                for head_atom in rule.head:
+                    for body_atom in rule.body:
+                        if body_atom < 0:
+                            if head_atom == abs(body_atom):
+                                constraint_atoms.append(head_atom)
+                            dep_graph.add_edge(head_atom, abs(body_atom), color="red")
+                        else:
+                            dep_graph.add_edge(head_atom, abs(body_atom))
+        #finding strongly connected components
+        node_list = self._dfs_ordering(dep_graph)
+        #inverting dependency graph according to scc-algorithm
+        dep_graph_t = nx.DiGraph()
+        for u,v,c in dep_graph.edges(data="color"):
+            dep_graph_t.add_edge(v, u, color=c)
+        #calling second dfs on transposed graph. every node reachable from vertices correctly ordered by finishing time is part of a scc
+        scc_list = self._dfs_scc(dep_graph_t, node_list)
+        #calling traverse_tree on scc-atoms to save every rule which implies a scc-atom
+        atoms_visited = {}
+        self._traverse_tree(constraint_atoms, atoms_visited, dep_graph)
+        for scc in scc_list:
+            self._traverse_tree(scc, atoms_visited, dep_graph)
+        optimized_program = []
+        #this also removes all leaf-atoms of self._program 
+        for rule in self._program:
+            if len(rule.head) == 0:
+                optimized_program.append(rule)
+            else: 
+                for atom in rule.head:
+                    if atoms_visited.get(atom):
+                        optimized_program.append(rule)
+        #print("ORIGINAL PROGRAM: ", len(self._program))
+        self._program = optimized_program
+        #print("OPTIMIZED PROGRAM: ", len(optimized_program))
+
+    #dfs-algorithm to put vertices into a list in order of decreasing finishing time
+    def _dfs_ordering(self, dep_graph):
+        visited = {}
+        node_list = []
+        for node in dep_graph.nodes():
+            if visited.get(node) == None:
+                self._dfs_ordering_visit(node, dep_graph, visited, node_list)
+        node_list.reverse()
+        return node_list
+
+    #recursive element of dfs, appends vertex to list when finished
+    def _dfs_ordering_visit(self, node, dep_graph, visited, node_list):
+        visited[node] = True
+        for neighbor in dep_graph.neighbors(node):
+            if visited.get(neighbor) == None:
+                self._dfs_ordering_visit(neighbor, dep_graph, visited, node_list)
+        node_list.append(node)
+
+    def _dfs_scc(self, dep_graph_t, node_list):
+        scc_list = []
+        visited = {}
+        #variable which is switched to True if a negative edge is encountered in a scc
+        negative_edge = [False]
+        edge_dict = dict(dep_graph_t.edges())
+        for node in node_list:
+            negative_edge[0] = False
+            scc = []
+            if visited.get(node) == None:
+                self._dfs_scc_visit(node, dep_graph_t, visited, scc, negative_edge, edge_dict)
+                if len(scc) > 1 and negative_edge[0]:
+                    scc_list.append(scc)
+        return scc_list
+
+    #recursive element of dfs, appends vertex to scc
+    def _dfs_scc_visit(self, node, dep_graph_t, visited, scc, negative_edge, edge_dict):
+        visited[node] = True
+        for neighbor in dep_graph_t.neighbors(node):
+            if edge_dict.get((node, neighbor)).get('color'):
+                    negative_edge[0] = True
+            if visited.get(neighbor) == None:
+                self._dfs_scc_visit(neighbor, dep_graph_t, visited, scc, negative_edge, edge_dict)
+        scc.append(node)
+
+
+    def _remove_irrelevant_rules_problog(self):
+        print("--- REMOVE IRRELEVANT RULES problog ---")
+        queries = self.get_queries()
+        varMap = {name : var for var, name in self._nameMap.items()}
+        #varMap2 = {var : name for var, name in self._nameMap.items()}
+        #test= [varMap2[guess] for guess in self._guess]
+        #print(len(test))
+        query_atoms = [varMap[query] for query in queries]
+        atoms_visited = {}
+        dep_graph = nx.DiGraph()
+        for rule in self._program:
+            for head_atom in rule.head:
+                for body_atom in rule.body:
+                    dep_graph.add_edge(head_atom, abs(body_atom))
+        for atom in query_atoms:
+            if not dep_graph.has_node(atom):
+                continue
+            if dep_graph.out_degree(atom) == 0:
+                continue
+            if atoms_visited.get(atom):
+                continue
+            self._traverse_tree([atom], atoms_visited, dep_graph)
+        optimized_program = []
+        for rule in self._program:
+            for atom in rule.head:
+                if atoms_visited.get(atom):
+                    optimized_program.append(rule)
+        temp = len(self._program)
+        #print("ORIGINAL PROGRAM: ", temp)
+        self._program = optimized_program
+        #print("OPTIMIZED PROGRAM: ", temp-len(optimized_program))
+        
+    def _traverse_tree(self, stack, visited, dep_graph):
+        while len(stack) > 0:
+            node = stack.pop()
+            if visited.get(node):
+                continue
+            visited[node] = True
+            #visit(node)
+            if not dep_graph.has_node(abs(node)):
+                continue
+            for atom in dep_graph.neighbors(abs(node)):
+                if visited.get(atom):
+                    continue
+                stack.append(atom)
 
     def _remove_tautologies(self, clingo_control):
         tmp = []
