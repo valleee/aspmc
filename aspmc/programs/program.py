@@ -109,21 +109,32 @@ class Program(object):
         # the tree decomposition of the program
         self._td = None
         self._normalize(clingo_control)
-        #self._remove_irrelevant_rules_asp()
-        self._remove_irrelevant_rules_problog()
+        self._remove_irrelevant_rules()
 
-    def _remove_irrelevant_rules_asp(self):
-        print("--- REMOVE IRRELEVANT RULES asp ---")
+    def _remove_irrelevant_rules(self):
         dep_graph = nx.DiGraph()
+        relevant_dic = {}
+        optimized_program = []
+        self._get_relevant_atoms(relevant_dic, optimized_program, dep_graph)
+        #this also removes all leaf-atoms of self._program 
+        for rule in self._program:
+            for atom in rule.head:
+                if relevant_dic.get(atom):
+                    optimized_program.append(rule)
+        self._program = optimized_program
+
+    def _get_relevant_atoms(self, relevant_dic, optimized_program, dep_graph):
         constraint_atoms = []
         for rule in self._program:
             if len(rule.head) == 0:
-                 for body_atom in rule.body:
+                optimized_program.append(rule)
+                for body_atom in rule.body:
                     constraint_atoms.append(body_atom)
             else:
                 for head_atom in rule.head:
                     for body_atom in rule.body:
                         if body_atom < 0:
+                            #this would be a "killing clause"
                             if head_atom == abs(body_atom):
                                 constraint_atoms.append(head_atom)
                             dep_graph.add_edge(head_atom, abs(body_atom), color="red")
@@ -138,23 +149,10 @@ class Program(object):
         #calling second dfs on transposed graph. every node reachable from vertices correctly ordered by finishing time is part of a scc
         scc_list = self._dfs_scc(dep_graph_t, node_list)
         #calling traverse_tree on scc-atoms to save every rule which implies a scc-atom
-        atoms_visited = {}
-        self._traverse_tree(constraint_atoms, atoms_visited, dep_graph)
+        self._traverse_tree(constraint_atoms, relevant_dic, dep_graph)
         for scc in scc_list:
-            self._traverse_tree(scc, atoms_visited, dep_graph)
-        optimized_program = []
-        #this also removes all leaf-atoms of self._program 
-        for rule in self._program:
-            if len(rule.head) == 0:
-                optimized_program.append(rule)
-            else: 
-                for atom in rule.head:
-                    if atoms_visited.get(atom):
-                        optimized_program.append(rule)
-        #print("ORIGINAL PROGRAM: ", len(self._program))
-        self._program = optimized_program
-        #print("OPTIMIZED PROGRAM: ", len(optimized_program))
-
+            self._traverse_tree(scc, relevant_dic, dep_graph)
+        
     #dfs-algorithm to put vertices into a list in order of decreasing finishing time
     def _dfs_ordering(self, dep_graph):
         visited = {}
@@ -198,46 +196,13 @@ class Program(object):
                 self._dfs_scc_visit(neighbor, dep_graph_t, visited, scc, negative_edge, edge_dict)
         scc.append(node)
 
-
-    def _remove_irrelevant_rules_problog(self):
-        print("--- REMOVE IRRELEVANT RULES problog ---")
-        queries = self.get_queries()
-        varMap = {name : var for var, name in self._nameMap.items()}
-        #varMap2 = {var : name for var, name in self._nameMap.items()}
-        #test= [varMap2[guess] for guess in self._guess]
-        #print(len(test))
-        query_atoms = [varMap[query] for query in queries]
-        atoms_visited = {}
-        dep_graph = nx.DiGraph()
-        for rule in self._program:
-            for head_atom in rule.head:
-                for body_atom in rule.body:
-                    dep_graph.add_edge(head_atom, abs(body_atom))
-        for atom in query_atoms:
-            if not dep_graph.has_node(atom):
-                continue
-            if dep_graph.out_degree(atom) == 0:
-                continue
-            if atoms_visited.get(atom):
-                continue
-            self._traverse_tree([atom], atoms_visited, dep_graph)
-        optimized_program = []
-        for rule in self._program:
-            for atom in rule.head:
-                if atoms_visited.get(atom):
-                    optimized_program.append(rule)
-        temp = len(self._program)
-        #print("ORIGINAL PROGRAM: ", temp)
-        self._program = optimized_program
-        #print("OPTIMIZED PROGRAM: ", temp-len(optimized_program))
-        
+    #dfs-traversal of every vertex of the dependency-graph reachable from stack-atoms
     def _traverse_tree(self, stack, visited, dep_graph):
         while len(stack) > 0:
             node = stack.pop()
             if visited.get(node):
                 continue
             visited[node] = True
-            #visit(node)
             if not dep_graph.has_node(abs(node)):
                 continue
             for atom in dep_graph.neighbors(abs(node)):

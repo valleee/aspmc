@@ -344,3 +344,20 @@ class ProblogProgram(Program):
 
     def get_queries(self):
         return self.queries
+
+    def _get_relevant_atoms(self, atoms_visited, optimized_program, dep_graph):
+        queries = self.get_queries()
+        varMap = {name : var for var, name in self._nameMap.items()}
+        query_atoms = [varMap[query] for query in queries]
+        for rule in self._program:
+            for head_atom in rule.head:
+                for body_atom in rule.body:
+                    dep_graph.add_edge(head_atom, abs(body_atom))
+        for atom in query_atoms:
+            if not dep_graph.has_node(atom):
+                continue
+            if dep_graph.out_degree(atom) == 0:
+                continue
+            if atoms_visited.get(atom):
+                continue
+            self._traverse_tree([atom], atoms_visited, dep_graph)
